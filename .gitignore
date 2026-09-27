@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+.pnp
+.pnp.*
+
+# testing
+coverage
+playwright-report
+test-results
+blob-report
+
+# next.js
+.next/
+out/
+build
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env
+.env*.local
+
+# local uploads
+storage/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+pnpm-debug.log*
