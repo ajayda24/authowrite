@@ -16,9 +16,12 @@ function ResetForm() {
 
   if (!token) {
     return (
-      <p className="leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground leading-relaxed">
         This link is invalid or has expired.{" "}
-        <Link className="text-accent underline" href="/forgot-password">Request a new one</Link>.
+        <Link className="text-accent underline" href="/forgot-password">
+          Request a new one
+        </Link>
+        .
       </p>
     );
   }
@@ -38,7 +41,14 @@ function ResetForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <FormError message={error} />
       <Field label="New password" htmlFor="password" hint="At least 8 characters.">
-        <Input id="password" name="password" type="password" autoComplete="new-password" required autoFocus />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          autoFocus
+        />
       </Field>
       <Button type="submit" className="w-full" size="lg" disabled={pending}>
         {pending ? "Saving…" : "Set new password"}

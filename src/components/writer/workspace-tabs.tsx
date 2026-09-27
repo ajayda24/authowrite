@@ -20,8 +20,8 @@ export function WorkspaceTabs({ storyId }: { storyId: string }) {
             href={tab.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "-mb-px border-b-2 border-transparent pb-2.5 text-muted-foreground hover:text-foreground",
-              active && "border-foreground font-medium text-foreground",
+              "text-muted-foreground hover:text-foreground -mb-px border-b-2 border-transparent pb-2.5",
+              active && "border-foreground text-foreground font-medium",
             )}
           >
             {tab.label}

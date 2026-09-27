@@ -21,7 +21,7 @@ export function SheetContent({
       <Primitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
       <Primitive.Content
         className={cn(
-          "fixed inset-y-0 z-50 flex w-[min(20rem,85vw)] flex-col border-border bg-background p-5 shadow-soft focus:outline-none",
+          "border-border bg-background shadow-soft fixed inset-y-0 z-50 flex w-[min(20rem,85vw)] flex-col p-5 focus:outline-none",
           side === "right" ? "right-0 border-l" : "left-0 border-r",
           className,
         )}
@@ -29,7 +29,7 @@ export function SheetContent({
       >
         {children}
         <Primitive.Close
-          className="absolute top-4 right-4 rounded-sm p-1 text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-sm p-1"
           aria-label="Close"
         >
           <XIcon className="size-4" />

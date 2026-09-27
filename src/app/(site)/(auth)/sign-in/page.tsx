@@ -18,9 +18,12 @@ export default async function SignInPage(props: PageProps<"/sign-in">) {
       <AuthHeading title="Welcome back" subtitle="Sign in to keep writing and reading." />
       <SocialButtons providers={enabledProviders()} next={target} />
       <SignInForm next={target} />
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-8 text-center text-sm">
         New here?{" "}
-        <Link href={`/sign-up${next ? `?next=${encodeURIComponent(target)}` : ""}`} className="font-medium text-foreground underline underline-offset-4">
+        <Link
+          href={`/sign-up${next ? `?next=${encodeURIComponent(target)}` : ""}`}
+          className="text-foreground font-medium underline underline-offset-4"
+        >
           Create an account
         </Link>
       </p>

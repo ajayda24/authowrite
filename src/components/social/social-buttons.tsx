@@ -15,7 +15,17 @@ function useSignInRedirect() {
   return () => router.push(`/sign-in?next=${encodeURIComponent(pathname)}`);
 }
 
-export function LikeButton({ storyId, liked, count, signedIn }: { storyId: string; liked: boolean; count: number; signedIn: boolean }) {
+export function LikeButton({
+  storyId,
+  liked,
+  count,
+  signedIn,
+}: {
+  storyId: string;
+  liked: boolean;
+  count: number;
+  signedIn: boolean;
+}) {
   const [state, setOptimistic] = useOptimistic({ liked, count });
   const [, startTransition] = useTransition();
   const toSignIn = useSignInRedirect();
@@ -34,13 +44,24 @@ export function LikeButton({ storyId, liked, count, signedIn }: { storyId: strin
         });
       }}
     >
-      <HeartIcon className={cn(state.liked && "fill-destructive text-destructive")} aria-hidden="true" />
+      <HeartIcon
+        className={cn(state.liked && "fill-destructive text-destructive")}
+        aria-hidden="true"
+      />
       <span className="tabular-nums">{formatCount(Math.max(0, state.count))}</span>
     </Button>
   );
 }
 
-export function BookmarkButton({ storyId, bookmarked, signedIn }: { storyId: string; bookmarked: boolean; signedIn: boolean }) {
+export function BookmarkButton({
+  storyId,
+  bookmarked,
+  signedIn,
+}: {
+  storyId: string;
+  bookmarked: boolean;
+  signedIn: boolean;
+}) {
   const [state, setOptimistic] = useOptimistic(bookmarked);
   const [, startTransition] = useTransition();
   const toSignIn = useSignInRedirect();

@@ -30,7 +30,11 @@ export function ReadingProgress({
       if (!track) return;
       const now = Date.now();
       const p = current.current;
-      if (!force && (now - lastSaved.current.at < 4000 || Math.abs(p - lastSaved.current.percent) < 0.03)) return;
+      if (
+        !force &&
+        (now - lastSaved.current.at < 4000 || Math.abs(p - lastSaved.current.percent) < 0.03)
+      )
+        return;
       lastSaved.current = { percent: p, at: now };
       void saveProgressAction({ storyId, chapterId, percent: p });
     }
@@ -67,7 +71,10 @@ export function ReadingProgress({
       aria-valuemax={100}
       aria-valuenow={Math.round(percent * 100)}
     >
-      <div className="h-full origin-left bg-accent transition-transform duration-150" style={{ transform: `scaleX(${percent})` }} />
+      <div
+        className="bg-accent h-full origin-left transition-transform duration-150"
+        style={{ transform: `scaleX(${percent})` }}
+      />
     </div>
   );
 }

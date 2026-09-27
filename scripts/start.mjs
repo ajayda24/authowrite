@@ -19,7 +19,8 @@ const child = spawn(process.execPath, ["--env-file-if-exists=.env", "server.js"]
     ...process.env,
     PORT: process.env.PORT ?? "3000",
     HOSTNAME: process.env.HOSTNAME ?? "0.0.0.0",
-    STORAGE_LOCAL_DIR: process.env.STORAGE_LOCAL_DIR ?? new URL("../storage", import.meta.url).pathname,
+    STORAGE_LOCAL_DIR:
+      process.env.STORAGE_LOCAL_DIR ?? new URL("../storage", import.meta.url).pathname,
   },
 });
 child.on("exit", (code) => process.exit(code ?? 0));

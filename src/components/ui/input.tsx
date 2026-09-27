@@ -9,7 +9,9 @@ export function Input({ className, ...props }: React.ComponentProps<"input">) {
 }
 
 export function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
-  return <textarea className={cn(fieldClasses, "min-h-24 py-2 leading-relaxed", className)} {...props} />;
+  return (
+    <textarea className={cn(fieldClasses, "min-h-24 py-2 leading-relaxed", className)} {...props} />
+  );
 }
 
 export function Select({ className, ...props }: React.ComponentProps<"select">) {
@@ -17,7 +19,7 @@ export function Select({ className, ...props }: React.ComponentProps<"select">) 
 }
 
 export function Label({ className, ...props }: React.ComponentProps<"label">) {
-  return <label className={cn("text-sm font-medium text-foreground", className)} {...props} />;
+  return <label className={cn("text-foreground text-sm font-medium", className)} {...props} />;
 }
 
 export function Field({
@@ -40,11 +42,11 @@ export function Field({
       <Label htmlFor={htmlFor}>{label}</Label>
       {children}
       {error ? (
-        <p className="text-[13px] text-destructive" role="alert">
+        <p className="text-destructive text-[13px]" role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-[13px] text-muted-foreground">{hint}</p>
+        <p className="text-muted-foreground text-[13px]">{hint}</p>
       ) : null}
     </div>
   );

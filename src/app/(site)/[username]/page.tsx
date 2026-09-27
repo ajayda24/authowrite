@@ -14,7 +14,10 @@ export async function generateMetadata(props: PageProps<"/[username]">): Promise
   const { username } = await props.params;
   const profile = await getProfile(null, decodeParam(username));
   if (!profile) return { title: "Author not found" };
-  return { title: `${profile.user.name} (@${profile.user.username})`, description: profile.user.bio || undefined };
+  return {
+    title: `${profile.user.name} (@${profile.user.username})`,
+    description: profile.user.bio || undefined,
+  };
 }
 
 export default async function ProfilePage(props: PageProps<"/[username]">) {
@@ -30,27 +33,58 @@ export default async function ProfilePage(props: PageProps<"/[username]">) {
         <Avatar name={user.name} src={user.image} size={88} />
         <div className="flex-1">
           <h1 className="font-display text-4xl font-semibold">{user.name}</h1>
-          <p className="mt-1 text-muted-foreground">@{user.username}</p>
-          {user.bio ? <p className="mt-4 max-w-xl leading-relaxed whitespace-pre-line">{user.bio}</p> : null}
-          <p className="mt-4 flex flex-wrap gap-x-5 text-sm text-muted-foreground">
-            <span><strong className="font-semibold text-foreground">{formatCount(stats.followers)}</strong> followers</span>
-            <span><strong className="font-semibold text-foreground">{formatCount(stats.following)}</strong> following</span>
+          <p className="text-muted-foreground mt-1">@{user.username}</p>
+          {user.bio ? (
+            <p className="mt-4 max-w-xl leading-relaxed whitespace-pre-line">{user.bio}</p>
+          ) : null}
+          <p className="text-muted-foreground mt-4 flex flex-wrap gap-x-5 text-sm">
+            <span>
+              <strong className="text-foreground font-semibold">
+                {formatCount(stats.followers)}
+              </strong>{" "}
+              followers
+            </span>
+            <span>
+              <strong className="text-foreground font-semibold">
+                {formatCount(stats.following)}
+              </strong>{" "}
+              following
+            </span>
             <span>Joined {formatDate(user.createdAt)}</span>
           </p>
         </div>
         {profile.isSelf ? (
-          <Button asChild variant="outline"><Link href="/settings">Edit profile</Link></Button>
+          <Button asChild variant="outline">
+            <Link href="/settings">Edit profile</Link>
+          </Button>
         ) : (
-          <FollowButton userId={user.id} name={user.name} following={profile.viewerFollows} signedIn={Boolean(viewer)} />
+          <FollowButton
+            userId={user.id}
+            name={user.name}
+            following={profile.viewerFollows}
+            signedIn={Boolean(viewer)}
+          />
         )}
       </header>
       <section aria-labelledby="stories-heading" className="mt-10">
-        <h2 id="stories-heading" className="font-display text-2xl font-semibold">Stories</h2>
+        <h2 id="stories-heading" className="font-display text-2xl font-semibold">
+          Stories
+        </h2>
         <StoryList
           stories={stories}
-          empty={profile.isSelf ? (
-            <span>You haven’t published anything yet. <Link className="text-accent underline" href="/write/new">Start a story</Link>.</span>
-          ) : `${user.name} hasn’t published any stories yet.`}
+          empty={
+            profile.isSelf ? (
+              <span>
+                You haven’t published anything yet.{" "}
+                <Link className="text-accent underline" href="/write/new">
+                  Start a story
+                </Link>
+                .
+              </span>
+            ) : (
+              `${user.name} hasn’t published any stories yet.`
+            )
+          }
         />
       </section>
     </div>

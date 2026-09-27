@@ -15,13 +15,18 @@ export function SocialButtons({ providers, next }: { providers: string[]; next: 
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => authClient.signIn.social({ provider: provider as "github" | "google", callbackURL: next })}
+          onClick={() =>
+            authClient.signIn.social({
+              provider: provider as "github" | "google",
+              callbackURL: next,
+            })
+          }
         >
           Continue with {LABELS[provider] ?? provider}
         </Button>
       ))}
-      <div className="flex items-center gap-3 py-2 text-xs text-subtle-foreground">
-        <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+      <div className="text-subtle-foreground flex items-center gap-3 py-2 text-xs">
+        <span className="bg-border h-px flex-1" /> or <span className="bg-border h-px flex-1" />
       </div>
     </div>
   );

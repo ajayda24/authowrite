@@ -4,9 +4,7 @@ import { z } from "zod";
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_URL: z.string().url().default("http://localhost:3000"),
-  DATABASE_URL: z
-    .string()
-    .default("postgres://authowrite:authowrite@localhost:5432/authowrite"),
+  DATABASE_URL: z.string().default("postgres://authowrite:authowrite@localhost:5432/authowrite"),
   BETTER_AUTH_SECRET: z.string().min(16).optional(),
 
   STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),

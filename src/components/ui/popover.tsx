@@ -18,7 +18,10 @@ export function PopoverContent({
       <Primitive.Content
         sideOffset={sideOffset}
         align={align}
-        className={cn("z-50 w-72 rounded-md border bg-surface p-4 shadow-soft outline-none", className)}
+        className={cn(
+          "bg-surface shadow-soft z-50 w-72 rounded-md border p-4 outline-none",
+          className,
+        )}
         {...props}
       />
     </Primitive.Portal>

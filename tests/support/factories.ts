@@ -4,7 +4,12 @@ import { users } from "@/server/db/schema";
 
 export async function createUser(overrides: Partial<typeof users.$inferInsert> = {}) {
   const id = overrides.id ?? nanoid();
-  const username = overrides.username ?? `user${id.slice(0, 6).toLowerCase().replace(/[^a-z0-9]/g, "x")}`;
+  const username =
+    overrides.username ??
+    `user${id
+      .slice(0, 6)
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "x")}`;
   const [user] = await db
     .insert(users)
     .values({

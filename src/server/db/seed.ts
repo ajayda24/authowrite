@@ -23,17 +23,37 @@ function doc(...blocks: (string | { h: string } | { quote: string } | "***")[]):
     type: "doc",
     content: blocks.map((block) => {
       if (block === "***") return { type: "horizontalRule" };
-      if (typeof block === "string") return { type: "paragraph", content: [{ type: "text", text: block }] };
-      if ("h" in block) return { type: "heading", attrs: { level: 2 }, content: [{ type: "text", text: block.h }] };
-      return { type: "blockquote", content: [{ type: "paragraph", content: [{ type: "text", text: block.quote }] }] };
+      if (typeof block === "string")
+        return { type: "paragraph", content: [{ type: "text", text: block }] };
+      if ("h" in block)
+        return { type: "heading", attrs: { level: 2 }, content: [{ type: "text", text: block.h }] };
+      return {
+        type: "blockquote",
+        content: [{ type: "paragraph", content: [{ type: "text", text: block.quote }] }],
+      };
     }),
   };
 }
 
 const AUTHORS = [
-  { name: "Meera Nair", username: "meera", email: "meera@demo.authowrite.org", bio: "I write about rain, rivers and the people who wait for them. Kochi." },
-  { name: "Tomás Reyes", username: "tomas", email: "tomas@demo.authowrite.org", bio: "Night-shift nurse, daytime science-fiction writer." },
-  { name: "Aiko Tan", username: "aiko", email: "aiko@demo.authowrite.org", bio: "Small mysteries in small towns." },
+  {
+    name: "Meera Nair",
+    username: "meera",
+    email: "meera@demo.authowrite.org",
+    bio: "I write about rain, rivers and the people who wait for them. Kochi.",
+  },
+  {
+    name: "Tomás Reyes",
+    username: "tomas",
+    email: "tomas@demo.authowrite.org",
+    bio: "Night-shift nurse, daytime science-fiction writer.",
+  },
+  {
+    name: "Aiko Tan",
+    username: "aiko",
+    email: "aiko@demo.authowrite.org",
+    bio: "Small mysteries in small towns.",
+  },
 ];
 
 interface SeedStory {
@@ -146,7 +166,10 @@ const STORIES: SeedStory[] = [
 ];
 
 async function main() {
-  const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.username, "meera"));
+  const [existing] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.username, "meera"));
   if (existing) {
     console.log("Demo data already present — nothing to do.");
     process.exit(0);
@@ -155,9 +178,17 @@ async function main() {
   const ids = new Map<string, string>();
   for (const author of AUTHORS) {
     const result = await auth.api.signUpEmail({
-      body: { name: author.name, email: author.email, password: PASSWORD, username: author.username },
+      body: {
+        name: author.name,
+        email: author.email,
+        password: PASSWORD,
+        username: author.username,
+      },
     });
-    await db.update(users).set({ bio: author.bio, displayUsername: author.username }).where(eq(users.id, result.user.id));
+    await db
+      .update(users)
+      .set({ bio: author.bio, displayUsername: author.username })
+      .where(eq(users.id, result.user.id));
     ids.set(author.username, result.user.id);
     console.log(`Created @${author.username}`);
   }
@@ -175,7 +206,11 @@ async function main() {
     });
     for (const [index, chapter] of seed.chapters.entries()) {
       const chapterId = index === 0 ? firstChapterId : (await addChapter(actor, story.id)).id;
-      await saveChapter(actor, chapterId, { title: chapter.title, content: chapter.content, expectedRevision: 0 });
+      await saveChapter(actor, chapterId, {
+        title: chapter.title,
+        content: chapter.content,
+        expectedRevision: 0,
+      });
       await publishChapter(actor, chapterId, { publishStory: true });
     }
     storyIds.push(story.id);

@@ -7,11 +7,16 @@ import { loadOr404 } from "@/server/services/load";
 
 export const metadata: Metadata = { title: "Writing" };
 
-export default async function ChapterEditorPage(props: PageProps<"/write/[storyId]/chapters/[chapterId]">) {
+export default async function ChapterEditorPage(
+  props: PageProps<"/write/[storyId]/chapters/[chapterId]">,
+) {
   const { storyId, chapterId } = await props.params;
   const path = `/write/${storyId}/chapters/${chapterId}`;
   const viewer = await requireViewer(path);
-  const { chapter, story, authorUsername } = await loadOr404(() => getChapterForEditor(viewer, chapterId), path);
+  const { chapter, story, authorUsername } = await loadOr404(
+    () => getChapterForEditor(viewer, chapterId),
+    path,
+  );
 
   return (
     <ChapterEditor

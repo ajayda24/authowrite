@@ -22,7 +22,7 @@ export function NavLinks({ vertical = false }: { vertical?: boolean }) {
               href={link.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "block rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground",
+                "text-muted-foreground hover:text-foreground block rounded-md px-2.5 py-1.5 text-sm transition-colors",
                 active && "text-foreground",
                 vertical && "px-0 py-2 text-base",
               )}

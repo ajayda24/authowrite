@@ -37,3 +37,15 @@ describe("normalizeTag", () => {
     expect(normalizeTag("  മഴ ")).toBe("മഴ");
   });
 });
+
+describe("upload keys", async () => {
+  const { isUploadKey, isUploadUrl } = await import("@/lib/files");
+  it("accepts only generated keys", () => {
+    expect(isUploadKey("u/abc/2026-09/x_Y-1.png")).toBe(true);
+    expect(isUploadKey("u/abc/2026-09/x.png", "abc")).toBe(true);
+    expect(isUploadKey("u/abc/2026-09/x.png", "other")).toBe(false);
+    expect(isUploadKey("u/abc/../../etc/passwd")).toBe(false);
+    expect(isUploadUrl("/api/files/u/abc/2026-09/../../auth/sign-out")).toBe(false);
+    expect(isUploadUrl("/api/files/u/abc/2026-09/x.webp", "abc")).toBe(true);
+  });
+});

@@ -22,15 +22,9 @@ import {
   type StoryStatus,
 } from "@/server/db/schema";
 import { EMPTY_DOC } from "@/lib/content/types";
-import { fileUrl } from "@/lib/files";
+import { fileUrl, isUploadKey } from "@/lib/files";
 import { slugify, uniqueSlug } from "@/lib/slug";
-import {
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-  requireActor,
-  type Actor,
-} from "./errors";
+import { ForbiddenError, NotFoundError, ValidationError, requireActor, type Actor } from "./errors";
 import { parseInput, titleSchema } from "./validation";
 
 export type Story = typeof stories.$inferSelect;
@@ -78,10 +72,7 @@ export async function createStory(actor: Actor, input: { title: string }) {
   const slug = await uniqueSlug(slugify(title), (s) => slugTaken(user.id, s));
 
   return db.transaction(async (tx) => {
-    const [story] = await tx
-      .insert(stories)
-      .values({ authorId: user.id, title, slug })
-      .returning();
+    const [story] = await tx.insert(stories).values({ authorId: user.id, title, slug }).returning();
     const [chapter] = await tx
       .insert(chapters)
       .values({ storyId: story.id, position: 1, title: "Chapter 1", content: EMPTY_DOC })
@@ -112,7 +103,7 @@ export async function updateStory(actor: Actor, storyId: string, input: UpdateSt
     const [genre] = await db.select().from(genres).where(eq(genres.slug, data.genreSlug));
     if (!genre) throw new ValidationError("Choose a genre from the list.");
   }
-  if (data.coverKey && !data.coverKey.startsWith(`u/${story.authorId}/`)) {
+  if (data.coverKey && !isUploadKey(data.coverKey, story.authorId)) {
     throw new ValidationError("Upload the cover image first.");
   }
 
@@ -150,9 +141,7 @@ export async function updateStory(actor: Actor, storyId: string, input: UpdateSt
         .select({ id: tags.id })
         .from(tags)
         .where(inArray(tags.name, tagNames));
-      await tx
-        .insert(storyTags)
-        .values(tagRows.map((t) => ({ storyId: story.id, tagId: t.id })));
+      await tx.insert(storyTags).values(tagRows.map((t) => ({ storyId: story.id, tagId: t.id })));
     }
   });
 
@@ -214,10 +203,7 @@ export async function getStoryWorkspace(actor: Actor, storyId: string) {
       .where(eq(storyTags.storyId, story.id))
       .orderBy(asc(tags.name)),
     db.select().from(genres).orderBy(asc(genres.position)),
-    db
-      .select({ username: users.username })
-      .from(users)
-      .where(eq(users.id, story.authorId)),
+    db.select({ username: users.username }).from(users).where(eq(users.id, story.authorId)),
   ]);
 
   return {
@@ -259,7 +245,11 @@ export async function listMyStories(actor: Actor) {
     .where(eq(stories.authorId, user.id))
     .orderBy(desc(sql`greatest(${stories.updatedAt}, ${chapterStats.lastEdited})`));
 
-  return rows.map((r) => ({ ...r, lastEdited: new Date(r.lastEdited), coverUrl: fileUrl(r.coverKey) }));
+  return rows.map((r) => ({
+    ...r,
+    lastEdited: new Date(r.lastEdited),
+    coverUrl: fileUrl(r.coverKey),
+  }));
 }
 
 // ---------------------------------------------------------------------------

@@ -17,18 +17,25 @@ export default function ForgotPasswordPage() {
     setPending(true);
     setError(null);
     const email = String(new FormData(event.currentTarget).get("email") ?? "").trim();
-    const { error } = await authClient.requestPasswordReset({ email, redirectTo: "/reset-password" });
+    const { error } = await authClient.requestPasswordReset({
+      email,
+      redirectTo: "/reset-password",
+    });
     setPending(false);
-    if (error && error.status === 429) return setError("Too many requests. Please try again later.");
+    if (error && error.status === 429)
+      return setError("Too many requests. Please try again later.");
     // Always show the same message so accounts can't be discovered.
     setSent(true);
   }
 
   return (
     <>
-      <AuthHeading title="Reset your password" subtitle="We'll email you a link to choose a new one." />
+      <AuthHeading
+        title="Reset your password"
+        subtitle="We'll email you a link to choose a new one."
+      />
       {sent ? (
-        <p className="rounded-md border bg-muted px-4 py-3 leading-relaxed">
+        <p className="bg-muted rounded-md border px-4 py-3 leading-relaxed">
           If an account exists for that email, a reset link is on its way. Check your inbox.
         </p>
       ) : (
@@ -42,8 +49,10 @@ export default function ForgotPasswordPage() {
           </Button>
         </form>
       )}
-      <p className="mt-8 text-center text-sm text-muted-foreground">
-        <Link href="/sign-in" className="underline underline-offset-4">Back to sign in</Link>
+      <p className="text-muted-foreground mt-8 text-center text-sm">
+        <Link href="/sign-in" className="underline underline-offset-4">
+          Back to sign in
+        </Link>
       </p>
     </>
   );

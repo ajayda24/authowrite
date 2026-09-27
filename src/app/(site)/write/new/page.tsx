@@ -9,9 +9,9 @@ export default async function NewStoryPage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-16 sm:py-24">
       <h1 className="font-display text-4xl font-semibold">What’s your story called?</h1>
-      <p className="mt-3 text-muted-foreground">
-        A working title is fine — you can change it any time. Next, you’ll be taken straight to
-        your first chapter.
+      <p className="text-muted-foreground mt-3">
+        A working title is fine — you can change it any time. Next, you’ll be taken straight to your
+        first chapter.
       </p>
       <NewStoryForm />
     </div>

@@ -6,13 +6,19 @@
  * for unknown containers, unwrapped so the writer's text is not lost). The
  * result is safe to store and to render with `renderDocToHtml`.
  */
+import { isUploadUrl } from "@/lib/files";
 import type { BlockType, ContentNode, DocNode, Mark, MarkType } from "./types";
 
 const MAX_DEPTH = 12;
 const MAX_NODES = 50_000;
 const MAX_TEXT_LENGTH = 1_000_000;
 
-const BLOCK_CONTAINERS = new Set<BlockType>(["blockquote", "bulletList", "orderedList", "listItem"]);
+const BLOCK_CONTAINERS = new Set<BlockType>([
+  "blockquote",
+  "bulletList",
+  "orderedList",
+  "listItem",
+]);
 const TEXT_BLOCKS = new Set<BlockType>(["paragraph", "heading"]);
 const SIMPLE_MARKS = new Set<MarkType>(["bold", "italic", "underline", "strike"]);
 
@@ -35,7 +41,7 @@ export function isSafeHref(href: unknown): href is string {
 export function isSafeImageSrc(src: unknown): src is string {
   if (typeof src !== "string") return false;
   const value = src.trim();
-  if (value.startsWith("/api/files/") && !value.includes("..")) return true;
+  if (isUploadUrl(value)) return true;
   try {
     return new URL(value).protocol === "https:";
   } catch {

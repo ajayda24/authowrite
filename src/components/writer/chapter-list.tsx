@@ -15,7 +15,14 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog, Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import {
+  ConfirmDialog,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,9 +65,14 @@ export function ChapterList({ storyId, chapters }: { storyId: string; chapters: 
     <section aria-labelledby="chapters-heading">
       <div className="flex items-baseline justify-between">
         <h2 id="chapters-heading" className="font-display text-xl font-semibold">
-          Chapters <span className="ml-1 text-sm font-normal text-muted-foreground">{formatCount(totalWords)} words</span>
+          Chapters{" "}
+          <span className="text-muted-foreground ml-1 text-sm font-normal">
+            {formatCount(totalWords)} words
+          </span>
         </h2>
-        <form action={() => perform(() => addChapterAction(storyId).then((r) => r ?? { ok: true }))}>
+        <form
+          action={() => perform(() => addChapterAction(storyId).then((r) => r ?? { ok: true }))}
+        >
           <Button type="submit" variant="outline" size="sm" disabled={pending}>
             <PlusIcon /> Add chapter
           </Button>
@@ -69,15 +81,17 @@ export function ChapterList({ storyId, chapters }: { storyId: string; chapters: 
       <ol className="mt-4 divide-y rounded-md border" aria-busy={pending}>
         {chapters.map((chapter, index) => (
           <li key={chapter.id} className="flex items-center gap-3 px-3 py-3 sm:px-4">
-            <span className="w-6 text-right font-display text-sm text-subtle-foreground tabular-nums">{chapter.position}</span>
+            <span className="font-display text-subtle-foreground w-6 text-right text-sm tabular-nums">
+              {chapter.position}
+            </span>
             <div className="min-w-0 flex-1">
               <Link
                 href={`/write/${storyId}/chapters/${chapter.id}`}
-                className="block truncate font-medium hover:underline decoration-1 underline-offset-4"
+                className="block truncate font-medium decoration-1 underline-offset-4 hover:underline"
               >
                 {chapter.title || `Chapter ${chapter.position}`}
               </Link>
-              <p className="text-[13px] text-muted-foreground">
+              <p className="text-muted-foreground text-[13px]">
                 {formatCount(chapter.wordCount)} words · edited {formatRelative(chapter.updatedAt)}
               </p>
             </div>
@@ -117,7 +131,12 @@ function ChapterMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${label}`} disabled={disabled}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Actions for ${label}`}
+            disabled={disabled}
+          >
             <MoreHorizontalIcon />
           </Button>
         </DropdownMenuTrigger>
@@ -126,19 +145,36 @@ function ChapterMenu({
             <PencilIcon /> Rename
           </DropdownMenuItem>
           {chapter.status === "published" ? (
-            <DropdownMenuItem onSelect={() => perform(() => setChapterStatusAction(chapter.id, "draft"), "Chapter moved back to drafts.")}>
+            <DropdownMenuItem
+              onSelect={() =>
+                perform(
+                  () => setChapterStatusAction(chapter.id, "draft"),
+                  "Chapter moved back to drafts.",
+                )
+              }
+            >
               <EyeOffIcon /> Unpublish
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem onSelect={() => perform(() => setChapterStatusAction(chapter.id, "published"), "Chapter published.")}>
+            <DropdownMenuItem
+              onSelect={() =>
+                perform(() => setChapterStatusAction(chapter.id, "published"), "Chapter published.")
+              }
+            >
               <EyeIcon /> Publish
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem disabled={isFirst} onSelect={() => perform(() => moveChapterAction(chapter.id, "up"))}>
+          <DropdownMenuItem
+            disabled={isFirst}
+            onSelect={() => perform(() => moveChapterAction(chapter.id, "up"))}
+          >
             <ArrowUpIcon /> Move up
           </DropdownMenuItem>
-          <DropdownMenuItem disabled={isLast} onSelect={() => perform(() => moveChapterAction(chapter.id, "down"))}>
+          <DropdownMenuItem
+            disabled={isLast}
+            onSelect={() => perform(() => moveChapterAction(chapter.id, "down"))}
+          >
             <ArrowDownIcon /> Move down
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -147,7 +183,10 @@ function ChapterMenu({
             description="This chapter and its comments will be permanently deleted. This can’t be undone."
             onConfirm={() => perform(() => deleteChapterAction(chapter.id), "Chapter deleted.")}
             trigger={
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive data-[highlighted]:text-destructive [&_svg]:!text-destructive">
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="text-destructive data-[highlighted]:text-destructive [&_svg]:!text-destructive"
+              >
                 <TrashIcon /> Delete
               </DropdownMenuItem>
             }
@@ -167,10 +206,20 @@ function ChapterMenu({
               perform(() => renameChapterAction(chapter.id, title));
             }}
           >
-            <label htmlFor={`rename-${chapter.id}`} className="sr-only">Chapter title</label>
-            <Input id={`rename-${chapter.id}`} name="title" defaultValue={chapter.title} maxLength={160} autoFocus />
+            <label htmlFor={`rename-${chapter.id}`} className="sr-only">
+              Chapter title
+            </label>
+            <Input
+              id={`rename-${chapter.id}`}
+              name="title"
+              defaultValue={chapter.title}
+              maxLength={160}
+              autoFocus
+            />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setRenaming(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setRenaming(false)}>
+                Cancel
+              </Button>
               <Button type="submit">Save</Button>
             </DialogFooter>
           </form>

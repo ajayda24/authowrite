@@ -5,6 +5,7 @@ import { and, count, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/server/db";
 import { follows, stories, users } from "@/server/db/schema";
+import { isUploadUrl } from "@/lib/files";
 import { normalizeUsername, validateUsername } from "@/lib/usernames";
 import { ConflictError, ValidationError, requireActor, type Actor } from "./errors";
 import { isDiscoverable } from "./discovery";
@@ -91,7 +92,7 @@ export async function updateProfile(actor: Actor, input: z.input<typeof profileS
     .limit(1);
   if (existing && existing.id !== user.id) throw new ConflictError("That username is taken.");
 
-  if (data.image && !data.image.startsWith(`/api/files/u/${user.id}/`)) {
+  if (data.image && !isUploadUrl(data.image, user.id)) {
     throw new ValidationError("Upload the picture first.");
   }
 

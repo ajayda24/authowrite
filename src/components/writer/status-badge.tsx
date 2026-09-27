@@ -1,6 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 
-const LABELS: Record<string, { label: string; variant: "published" | "draft" | "default" | "accent" }> = {
+const LABELS: Record<
+  string,
+  { label: string; variant: "published" | "draft" | "default" | "accent" }
+> = {
   draft: { label: "Draft", variant: "draft" },
   published: { label: "Published", variant: "published" },
   unlisted: { label: "Unlisted", variant: "accent" },

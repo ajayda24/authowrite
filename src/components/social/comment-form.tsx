@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { addCommentAction, deleteCommentAction } from "@/server/actions/social";
 
-export function CommentForm({ storyId, chapterId, path }: { storyId: string; chapterId: string | null; path: string }) {
+export function CommentForm({
+  storyId,
+  chapterId,
+  path,
+}: {
+  storyId: string;
+  chapterId: string | null;
+  path: string;
+}) {
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   return (
@@ -23,8 +31,17 @@ export function CommentForm({ storyId, chapterId, path }: { storyId: string; cha
         });
       }}
     >
-      <label htmlFor="comment-body" className="sr-only">Your comment</label>
-      <Textarea id="comment-body" name="body" placeholder="What did you think?" maxLength={5000} rows={3} required />
+      <label htmlFor="comment-body" className="sr-only">
+        Your comment
+      </label>
+      <Textarea
+        id="comment-body"
+        name="body"
+        placeholder="What did you think?"
+        maxLength={5000}
+        rows={3}
+        required
+      />
       <div className="flex justify-end">
         <Button type="submit" size="sm" disabled={pending}>
           {pending ? "Posting…" : "Post comment"}
@@ -40,7 +57,7 @@ export function DeleteCommentButton({ commentId, path }: { commentId: string; pa
     <button
       type="button"
       disabled={pending}
-      className="mt-1 text-xs text-subtle-foreground hover:text-destructive"
+      className="text-subtle-foreground hover:text-destructive mt-1 text-xs"
       onClick={() => {
         if (!confirm("Delete this comment?")) return;
         startTransition(async () => {

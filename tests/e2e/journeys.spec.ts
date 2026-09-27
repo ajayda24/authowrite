@@ -26,7 +26,9 @@ test("a writer can go from sign-up to a published story in minutes", async ({ pa
   await page.keyboard.type("The lighthouse had been dark for eleven years.");
   await page.keyboard.press("Enter");
   await page.keyboard.type("Then, one night in March, it blinked.");
-  await expect(page.locator('[data-save-state="saved"]')).toContainText("Saved", { timeout: 15_000 });
+  await expect(page.locator('[data-save-state="saved"]')).toContainText("Saved", {
+    timeout: 15_000,
+  });
 
   await page.getByRole("button", { name: "Publish" }).click();
   const dialog = page.getByRole("dialog");
@@ -41,7 +43,9 @@ test("a writer can go from sign-up to a published story in minutes", async ({ pa
 
 test("a reader can discover, read, follow and bookmark", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Discover stories worth getting lost in." })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Discover stories worth getting lost in." }),
+  ).toBeVisible();
   await page.getByRole("link", { name: storyTitle }).first().click();
   await expect(page).toHaveURL(new RegExp(`${storyUrl}$`));
 
@@ -57,7 +61,10 @@ test("a reader can discover, read, follow and bookmark", async ({ page }) => {
   await page.waitForURL(/\/sign-up/);
   await signUp(page, reader, storyUrl);
 
-  await page.getByRole("button", { name: `Follow ${writer.name}` }).first().click();
+  await page
+    .getByRole("button", { name: `Follow ${writer.name}` })
+    .first()
+    .click();
   await expect(page.getByRole("button", { name: `Unfollow ${writer.name}` }).first()).toBeVisible();
   await page.getByRole("button", { name: "Bookmark" }).click();
   await expect(page.getByRole("button", { name: "Bookmarked" })).toBeVisible();

@@ -7,10 +7,16 @@ export function parseInput<T extends z.ZodType>(schema: T, input: unknown): z.in
   if (!result.success) {
     const issue = result.error.issues[0];
     const field = issue?.path.join(".");
-    throw new ValidationError(field ? `${field}: ${issue.message}` : (issue?.message ?? "Invalid input"));
+    throw new ValidationError(
+      field ? `${field}: ${issue.message}` : (issue?.message ?? "Invalid input"),
+    );
   }
   return result.data;
 }
 
-export const titleSchema = z.string().trim().min(1, "Give it a title.").max(160, "Keep the title under 160 characters.");
+export const titleSchema = z
+  .string()
+  .trim()
+  .min(1, "Give it a title.")
+  .max(160, "Keep the title under 160 characters.");
 export const uuidSchema = z.string().uuid();

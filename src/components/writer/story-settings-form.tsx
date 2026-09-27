@@ -10,7 +10,11 @@ import { Field, Input, Select, Textarea } from "@/components/ui/input";
 import { LANGUAGES } from "@/lib/languages";
 import { uploadImageFile } from "@/lib/upload-client";
 import { cn } from "@/lib/utils";
-import { deleteStoryAction, setStoryStatusAction, updateStoryAction } from "@/server/actions/stories";
+import {
+  deleteStoryAction,
+  setStoryStatusAction,
+  updateStoryAction,
+} from "@/server/actions/stories";
 
 type Status = "draft" | "published" | "unlisted" | "archived";
 
@@ -33,8 +37,16 @@ interface Props {
 const STATUS_OPTIONS: { value: Status; label: string; description: string }[] = [
   { value: "draft", label: "Draft", description: "Only you can see it." },
   { value: "published", label: "Published", description: "Anyone can find and read it." },
-  { value: "unlisted", label: "Unlisted", description: "Anyone with the link can read it, but it isn’t listed." },
-  { value: "archived", label: "Archived", description: "Hidden from readers. You can bring it back any time." },
+  {
+    value: "unlisted",
+    label: "Unlisted",
+    description: "Anyone with the link can read it, but it isn’t listed.",
+  },
+  {
+    value: "archived",
+    label: "Archived",
+    description: "Hidden from readers. You can bring it back any time.",
+  },
 ];
 
 export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props) {
@@ -89,7 +101,8 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
   function changeStatus(status: Status) {
     startTransition(async () => {
       const result = await setStoryStatusAction(story.id, status);
-      if (result.ok) toast.success(status === "published" ? "Your story is live." : "Visibility updated.");
+      if (result.ok)
+        toast.success(status === "published" ? "Your story is live." : "Visibility updated.");
       else toast.error(result.error);
     });
   }
@@ -109,40 +122,72 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
             onChange={(e) => onCoverSelected(e.target.files?.[0])}
           />
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => fileInput.current?.click()}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              onClick={() => fileInput.current?.click()}
+            >
               <ImageIcon /> {uploading ? "Uploading…" : cover.url ? "Change" : "Upload"}
             </Button>
             {cover.url ? (
-              <Button type="button" variant="ghost" size="sm" onClick={() => setCover({ key: null, url: null })}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setCover({ key: null, url: null })}
+              >
                 Remove
               </Button>
             ) : null}
           </div>
-          <p className="text-xs leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground text-xs leading-relaxed">
             No cover? We’ll design a simple one from your title. Best size: 1200×1800.
           </p>
         </div>
 
         <div className="space-y-5">
           <Field label="Title" htmlFor="title">
-            <Input id="title" name="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={160} required />
+            <Input
+              id="title"
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={160}
+              required
+            />
           </Field>
-          <Field label="Description" htmlFor="description" hint="A few sentences to invite readers in.">
-            <Textarea id="description" name="description" defaultValue={story.description} maxLength={2000} rows={5} />
+          <Field
+            label="Description"
+            htmlFor="description"
+            hint="A few sentences to invite readers in."
+          >
+            <Textarea
+              id="description"
+              name="description"
+              defaultValue={story.description}
+              maxLength={2000}
+              rows={5}
+            />
           </Field>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Genre" htmlFor="genre">
               <Select id="genre" name="genre" defaultValue={story.genreSlug ?? ""}>
                 <option value="">No genre</option>
                 {genres.map((g) => (
-                  <option key={g.slug} value={g.slug}>{g.name}</option>
+                  <option key={g.slug} value={g.slug}>
+                    {g.name}
+                  </option>
                 ))}
               </Select>
             </Field>
             <Field label="Language" htmlFor="language">
               <Select id="language" name="language" defaultValue={story.language}>
                 {LANGUAGES.map((l) => (
-                  <option key={l.code} value={l.code}>{l.name}</option>
+                  <option key={l.code} value={l.code}>
+                    {l.name}
+                  </option>
                 ))}
                 {!LANGUAGES.some((l) => l.code === story.language) ? (
                   <option value={story.language}>{story.language}</option>
@@ -151,11 +196,19 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
             </Field>
           </div>
           <Field label="Tags" htmlFor="tags" hint="Up to 8. Press Enter or comma to add.">
-            <div className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-md border border-border-strong bg-surface px-2 py-1.5 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25">
+            <div className="border-border-strong bg-surface focus-within:border-ring focus-within:ring-ring/25 flex min-h-10 flex-wrap items-center gap-1.5 rounded-md border px-2 py-1.5 focus-within:ring-2">
               {tags.map((tag) => (
-                <span key={tag} className="inline-flex items-center gap-1 rounded-sm bg-muted px-1.5 py-0.5 text-sm">
+                <span
+                  key={tag}
+                  className="bg-muted inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-sm"
+                >
                   #{tag}
-                  <button type="button" onClick={() => setTags(tags.filter((t) => t !== tag))} aria-label={`Remove tag ${tag}`} className="text-muted-foreground hover:text-foreground">
+                  <button
+                    type="button"
+                    onClick={() => setTags(tags.filter((t) => t !== tag))}
+                    aria-label={`Remove tag ${tag}`}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     <XIcon className="size-3" />
                   </button>
                 </span>
@@ -175,7 +228,7 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
                 onBlur={() => tagDraft && addTag(tagDraft)}
                 disabled={tags.length >= 8}
                 placeholder={tags.length ? "" : "monsoon, family, kerala"}
-                className="min-w-24 flex-1 bg-transparent py-0.5 text-[15px] outline-none placeholder:text-subtle-foreground"
+                className="placeholder:text-subtle-foreground min-w-24 flex-1 bg-transparent py-0.5 text-[15px] outline-none"
               />
             </div>
           </Field>
@@ -186,14 +239,23 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
       </form>
 
       <section aria-labelledby="visibility-heading" className="border-t pt-8">
-        <h2 id="visibility-heading" className="font-display text-xl font-semibold">Who can read this story?</h2>
+        <h2 id="visibility-heading" className="font-display text-xl font-semibold">
+          Who can read this story?
+        </h2>
         {!hasPublishedChapter ? (
-          <p className="mt-2 text-sm text-muted-foreground">Publish at least one chapter to share your story.</p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Publish at least one chapter to share your story.
+          </p>
         ) : null}
-        <div role="radiogroup" aria-labelledby="visibility-heading" className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div
+          role="radiogroup"
+          aria-labelledby="visibility-heading"
+          className="mt-4 grid gap-2 sm:grid-cols-2"
+        >
           {STATUS_OPTIONS.map((option) => {
             const active = story.status === option.value;
-            const blocked = !hasPublishedChapter && (option.value === "published" || option.value === "unlisted");
+            const blocked =
+              !hasPublishedChapter && (option.value === "published" || option.value === "unlisted");
             return (
               <button
                 key={option.value}
@@ -208,10 +270,18 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
                 )}
               >
                 <span className="flex items-center gap-2 font-medium">
-                  <span className={cn("size-3 rounded-full border border-border-strong", active && "border-4 border-foreground")} aria-hidden="true" />
+                  <span
+                    className={cn(
+                      "border-border-strong size-3 rounded-full border",
+                      active && "border-foreground border-4",
+                    )}
+                    aria-hidden="true"
+                  />
                   {option.label}
                 </span>
-                <span className="mt-1 block pl-5 text-sm text-muted-foreground">{option.description}</span>
+                <span className="text-muted-foreground mt-1 block pl-5 text-sm">
+                  {option.description}
+                </span>
               </button>
             );
           })}
@@ -219,8 +289,10 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
       </section>
 
       <section aria-labelledby="danger-heading" className="border-t pt-8">
-        <h2 id="danger-heading" className="font-display text-xl font-semibold">Delete story</h2>
-        <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+        <h2 id="danger-heading" className="font-display text-xl font-semibold">
+          Delete story
+        </h2>
+        <p className="text-muted-foreground mt-2 max-w-xl text-sm">
           Permanently deletes the story, every chapter, and all comments. If you only want to hide
           it, choose <strong>Archived</strong> above instead.
         </p>
@@ -235,7 +307,7 @@ export function StorySettingsForm({ story, genres, hasPublishedChapter }: Props)
             })
           }
           trigger={
-            <Button variant="outline" className="mt-4 text-destructive" disabled={pending}>
+            <Button variant="outline" className="text-destructive mt-4" disabled={pending}>
               <TrashIcon /> Delete story
             </Button>
           }

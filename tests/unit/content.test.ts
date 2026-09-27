@@ -16,13 +16,21 @@ describe("sanitizeDoc", () => {
             { type: "text", text: "fell", marks: [{ type: "italic" }, { type: "underline" }] },
           ],
         },
-        { type: "blockquote", content: [{ type: "paragraph", content: [{ type: "text", text: "q" }] }] },
+        {
+          type: "blockquote",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "q" }] }],
+        },
         {
           type: "bulletList",
-          content: [{ type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "a" }] }] }],
+          content: [
+            {
+              type: "listItem",
+              content: [{ type: "paragraph", content: [{ type: "text", text: "a" }] }],
+            },
+          ],
         },
         { type: "horizontalRule" },
-        { type: "image", attrs: { src: "/api/files/u/1/x.png", alt: "Cover" } },
+        { type: "image", attrs: { src: "/api/files/u/1/2026-09/x.png", alt: "Cover" } },
       ],
     };
     expect(sanitizeDoc(input)).toEqual(input);
@@ -35,7 +43,11 @@ describe("sanitizeDoc", () => {
         {
           type: "paragraph",
           content: [
-            { type: "text", text: "click", marks: [{ type: "link", attrs: { href: "javascript:alert(1)" } }] },
+            {
+              type: "text",
+              text: "click",
+              marks: [{ type: "link", attrs: { href: "javascript:alert(1)" } }],
+            },
           ],
         },
       ],
@@ -50,22 +62,37 @@ describe("sanitizeDoc", () => {
         { type: "script", text: "alert(1)" },
         { type: "image", attrs: { src: "javascript:alert(1)" } },
         { type: "image", attrs: { src: "http://insecure.example/x.png" } },
-        { type: "paragraph", attrs: { onclick: "alert(1)", style: "x" }, content: [{ type: "text", text: "ok" }] },
+        {
+          type: "paragraph",
+          attrs: { onclick: "alert(1)", style: "x" },
+          content: [{ type: "text", text: "ok" }],
+        },
       ],
     });
-    expect(out).toEqual({ type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "ok" }] }] });
+    expect(out).toEqual({
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "ok" }] }],
+    });
   });
 
   it("unwraps unknown containers so text survives", () => {
     const out = sanitizeDoc({
       type: "doc",
-      content: [{ type: "callout", content: [{ type: "paragraph", content: [{ type: "text", text: "kept" }] }] }],
+      content: [
+        {
+          type: "callout",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "kept" }] }],
+        },
+      ],
     });
     expect(docToText(out)).toBe("kept");
   });
 
   it("clamps heading levels and always returns a non-empty doc", () => {
-    expect(sanitizeDoc({ type: "doc", content: [{ type: "heading", attrs: { level: 1 } }] }).content[0].attrs).toEqual({ level: 2 });
+    expect(
+      sanitizeDoc({ type: "doc", content: [{ type: "heading", attrs: { level: 1 } }] }).content[0]
+        .attrs,
+    ).toEqual({ level: 2 });
     expect(sanitizeDoc(null)).toEqual({ type: "doc", content: [{ type: "paragraph" }] });
     expect(sanitizeDoc("<script>")).toEqual({ type: "doc", content: [{ type: "paragraph" }] });
   });
@@ -95,7 +122,13 @@ describe("renderDocToHtml", () => {
         content: [
           {
             type: "paragraph",
-            content: [{ type: "text", text: "site", marks: [{ type: "link", attrs: { href: "https://example.com" } }] }],
+            content: [
+              {
+                type: "text",
+                text: "site",
+                marks: [{ type: "link", attrs: { href: "https://example.com" } }],
+              },
+            ],
           },
         ],
       }),
@@ -118,7 +151,7 @@ describe("url checks", () => {
   ])("href %s → %s", (href, ok) => expect(isSafeHref(href)).toBe(ok));
 
   it("only allows uploaded or https images", () => {
-    expect(isSafeImageSrc("/api/files/u/1/a.png")).toBe(true);
+    expect(isSafeImageSrc("/api/files/u/1/2026-09/a.png")).toBe(true);
     expect(isSafeImageSrc("/api/files/../secret")).toBe(false);
     expect(isSafeImageSrc("data:image/png;base64,AAA")).toBe(false);
   });

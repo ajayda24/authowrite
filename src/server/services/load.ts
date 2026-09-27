@@ -12,7 +12,8 @@ export async function loadOr404<T>(fn: () => Promise<T>, returnTo?: string): Pro
     return await fn();
   } catch (error) {
     if (error instanceof DomainError) {
-      if (error.status === 401) redirect(returnTo ? `/sign-in?next=${encodeURIComponent(returnTo)}` : "/sign-in");
+      if (error.status === 401)
+        redirect(returnTo ? `/sign-in?next=${encodeURIComponent(returnTo)}` : "/sign-in");
       if (error.status === 403 || error.status === 404) notFound();
     }
     throw error;

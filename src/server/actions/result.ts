@@ -16,7 +16,8 @@ export async function run<T>(fn: () => Promise<T>): Promise<ActionResult<T>> {
     const data = await fn();
     return { ok: true, data } as ActionResult<T>;
   } catch (error) {
-    if (error instanceof DomainError) return { ok: false, error: error.message, code: error.status };
+    if (error instanceof DomainError)
+      return { ok: false, error: error.message, code: error.status };
     if (error instanceof RateLimitError) return { ok: false, error: error.message, code: 429 };
     // redirect()/notFound() throw special errors that must propagate.
     if (error && typeof error === "object" && "digest" in error) throw error;

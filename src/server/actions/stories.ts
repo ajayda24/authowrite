@@ -10,7 +10,9 @@ import { run } from "./result";
 
 export async function createStoryAction(_prev: unknown, formData: FormData) {
   const viewer = await getViewer();
-  const result = await run(() => stories.createStory(viewer, { title: String(formData.get("title") ?? "") }));
+  const result = await run(() =>
+    stories.createStory(viewer, { title: String(formData.get("title") ?? "") }),
+  );
   if (!result.ok) return result;
   redirect(`/write/${result.data.story.id}/chapters/${result.data.firstChapterId}`);
 }
@@ -51,7 +53,11 @@ export async function saveChapterAction(
   const viewer = await getViewer();
   return run(async () => {
     const saved = await chapters.saveChapter(viewer, chapterId, input);
-    return { revision: saved.revision, wordCount: saved.wordCount, savedAt: saved.updatedAt.toISOString() };
+    return {
+      revision: saved.revision,
+      wordCount: saved.wordCount,
+      savedAt: saved.updatedAt.toISOString(),
+    };
   });
 }
 

@@ -88,7 +88,9 @@ export async function searchStories(query: string, limit = 24): Promise<StorySum
     .select(storySummaryFields)
     .from(stories)
     .innerJoin(users, eq(users.id, stories.authorId))
-    .where(and(isDiscoverable, or(sql`${stories.search} @@ ${tsQuery}`, ilike(stories.title, prefix))))
+    .where(
+      and(isDiscoverable, or(sql`${stories.search} @@ ${tsQuery}`, ilike(stories.title, prefix))),
+    )
     .orderBy(desc(sql`ts_rank(${stories.search}, ${tsQuery})`), desc(stories.publishedAt))
     .limit(limit);
   return rows.map(toStorySummary);
@@ -107,7 +109,12 @@ export async function searchAuthors(query: string, limit = 12) {
       bio: users.bio,
     })
     .from(users)
-    .where(and(sql`${users.username} is not null`, or(ilike(users.username, pattern), ilike(users.name, pattern))))
+    .where(
+      and(
+        sql`${users.username} is not null`,
+        or(ilike(users.username, pattern), ilike(users.name, pattern)),
+      ),
+    )
     .orderBy(asc(users.username))
     .limit(limit);
 }

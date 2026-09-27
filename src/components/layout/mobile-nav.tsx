@@ -39,7 +39,7 @@ export function MobileNav({ signedIn }: { signedIn: boolean }) {
           </div>
         </nav>
         <div className="mt-auto">
-          <p className="mb-2 text-xs text-muted-foreground">Appearance</p>
+          <p className="text-muted-foreground mb-2 text-xs">Appearance</p>
           <ThemePicker />
         </div>
       </SheetContent>

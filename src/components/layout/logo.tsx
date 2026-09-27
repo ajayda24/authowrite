@@ -5,10 +5,13 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link
       href="/"
-      className={cn("group inline-flex items-baseline gap-1.5 font-display text-[1.35rem] font-semibold", className)}
+      className={cn(
+        "group font-display inline-flex items-baseline gap-1.5 text-[1.35rem] font-semibold",
+        className,
+      )}
       aria-label="Authowrite home"
     >
-      <span aria-hidden="true" className="translate-y-[1px] text-accent">
+      <span aria-hidden="true" className="text-accent translate-y-[1px]">
         ¶
       </span>
       <span>Authowrite</span>

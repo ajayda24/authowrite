@@ -22,7 +22,13 @@ import {
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { isSafeHref } from "@/lib/content/sanitize";
 import { uploadImageFile } from "@/lib/upload-client";
@@ -57,7 +63,7 @@ function ToolButton({
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={cn(
-        "inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-35 [&_svg]:size-4",
+        "text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-8 shrink-0 items-center justify-center rounded-sm transition-colors disabled:opacity-35 [&_svg]:size-4",
         active && "bg-muted text-foreground",
       )}
     >
@@ -67,7 +73,7 @@ function ToolButton({
 }
 
 function Divider() {
-  return <span className="mx-1 h-5 w-px shrink-0 bg-border" aria-hidden="true" />;
+  return <span className="bg-border mx-1 h-5 w-px shrink-0" aria-hidden="true" />;
 }
 
 export function EditorToolbar({ editor }: { editor: Editor }) {
@@ -110,53 +116,117 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
 
   return (
     <>
-      <div role="toolbar" aria-label="Formatting" className="flex items-center gap-0.5 overflow-x-auto py-1.5 [scrollbar-width:none]">
-        <ToolButton label="Text" active={s.paragraph} onClick={() => editor.chain().focus().setParagraph().run()}>
+      <div
+        role="toolbar"
+        aria-label="Formatting"
+        className="flex [scrollbar-width:none] items-center gap-0.5 overflow-x-auto py-1.5"
+      >
+        <ToolButton
+          label="Text"
+          active={s.paragraph}
+          onClick={() => editor.chain().focus().setParagraph().run()}
+        >
           <PilcrowIcon />
         </ToolButton>
-        <ToolButton label="Heading" active={s.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <ToolButton
+          label="Heading"
+          active={s.h2}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        >
           <Heading2Icon />
         </ToolButton>
-        <ToolButton label="Subheading" active={s.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <ToolButton
+          label="Subheading"
+          active={s.h3}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        >
           <Heading3Icon />
         </ToolButton>
         <Divider />
-        <ToolButton label="Bold" shortcut={`${mod}B`} active={s.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <ToolButton
+          label="Bold"
+          shortcut={`${mod}B`}
+          active={s.bold}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
           <BoldIcon />
         </ToolButton>
-        <ToolButton label="Italic" shortcut={`${mod}I`} active={s.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <ToolButton
+          label="Italic"
+          shortcut={`${mod}I`}
+          active={s.italic}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        >
           <ItalicIcon />
         </ToolButton>
-        <ToolButton label="Underline" shortcut={`${mod}U`} active={s.underline} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+        <ToolButton
+          label="Underline"
+          shortcut={`${mod}U`}
+          active={s.underline}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        >
           <UnderlineIcon />
         </ToolButton>
-        <ToolButton label="Strikethrough" active={s.strike} onClick={() => editor.chain().focus().toggleStrike().run()}>
+        <ToolButton
+          label="Strikethrough"
+          active={s.strike}
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+        >
           <StrikethroughIcon />
         </ToolButton>
         <ToolButton label="Link" active={s.link} onClick={() => setLinkOpen(true)}>
           <LinkIcon />
         </ToolButton>
         <Divider />
-        <ToolButton label="Quote" active={s.quote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <ToolButton
+          label="Quote"
+          active={s.quote}
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        >
           <QuoteIcon />
         </ToolButton>
-        <ToolButton label="Bulleted list" active={s.bullet} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <ToolButton
+          label="Bulleted list"
+          active={s.bullet}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        >
           <ListIcon />
         </ToolButton>
-        <ToolButton label="Numbered list" active={s.ordered} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ToolButton
+          label="Numbered list"
+          active={s.ordered}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        >
           <ListOrderedIcon />
         </ToolButton>
-        <ToolButton label="Scene break" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <ToolButton
+          label="Scene break"
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        >
           <MinusIcon />
         </ToolButton>
-        <ToolButton label={uploading ? "Uploading image…" : "Image"} disabled={uploading} onClick={() => fileInput.current?.click()}>
+        <ToolButton
+          label={uploading ? "Uploading image…" : "Image"}
+          disabled={uploading}
+          onClick={() => fileInput.current?.click()}
+        >
           <ImageIcon />
         </ToolButton>
         <Divider />
-        <ToolButton label="Undo" shortcut={`${mod}Z`} disabled={!s.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+        <ToolButton
+          label="Undo"
+          shortcut={`${mod}Z`}
+          disabled={!s.canUndo}
+          onClick={() => editor.chain().focus().undo().run()}
+        >
           <Undo2Icon />
         </ToolButton>
-        <ToolButton label="Redo" shortcut={isMac ? "⇧⌘Z" : "Ctrl+Y"} disabled={!s.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+        <ToolButton
+          label="Redo"
+          shortcut={isMac ? "⇧⌘Z" : "Ctrl+Y"}
+          disabled={!s.canRedo}
+          onClick={() => editor.chain().focus().redo().run()}
+        >
           <Redo2Icon />
         </ToolButton>
         <input
@@ -174,7 +244,15 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
   );
 }
 
-function LinkDialog({ editor, open, onOpenChange }: { editor: Editor; open: boolean; onOpenChange: (open: boolean) => void }) {
+function LinkDialog({
+  editor,
+  open,
+  onOpenChange,
+}: {
+  editor: Editor;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const current = (editor.getAttributes("link").href as string | undefined) ?? "";
   const [error, setError] = useState<string | null>(null);
 
@@ -190,7 +268,9 @@ function LinkDialog({ editor, open, onOpenChange }: { editor: Editor; open: bool
     if (!isSafeHref(href)) return setError("Enter a web address like https://example.com");
     const chain = editor.chain().focus().extendMarkRange("link");
     if (editor.state.selection.empty && !editor.isActive("link")) {
-      chain.insertContent({ type: "text", text: href, marks: [{ type: "link", attrs: { href } }] }).run();
+      chain
+        .insertContent({ type: "text", text: href, marks: [{ type: "link", attrs: { href } }] })
+        .run();
     } else {
       chain.setLink({ href }).run();
     }
@@ -199,16 +279,37 @@ function LinkDialog({ editor, open, onOpenChange }: { editor: Editor; open: bool
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setError(null); onOpenChange(o); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setError(null);
+        onOpenChange(o);
+      }}
+    >
       <DialogContent>
         <DialogTitle>{current ? "Edit link" : "Add link"}</DialogTitle>
         <DialogDescription>Leave empty to remove the link.</DialogDescription>
         <form onSubmit={apply} className="mt-4">
-          <label htmlFor="link-href" className="sr-only">Web address</label>
-          <Input id="link-href" name="href" defaultValue={current} placeholder="https://" autoFocus aria-invalid={Boolean(error)} />
-          {error ? <p role="alert" className="mt-2 text-sm text-destructive">{error}</p> : null}
+          <label htmlFor="link-href" className="sr-only">
+            Web address
+          </label>
+          <Input
+            id="link-href"
+            name="href"
+            defaultValue={current}
+            placeholder="https://"
+            autoFocus
+            aria-invalid={Boolean(error)}
+          />
+          {error ? (
+            <p role="alert" className="text-destructive mt-2 text-sm">
+              {error}
+            </p>
+          ) : null}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
             <Button type="submit">Apply</Button>
           </DialogFooter>
         </form>
@@ -216,4 +317,3 @@ function LinkDialog({ editor, open, onOpenChange }: { editor: Editor; open: bool
     </Dialog>
   );
 }
-

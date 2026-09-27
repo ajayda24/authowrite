@@ -55,17 +55,45 @@ export function ProfileForm({
       <div className="flex items-center gap-4">
         <Avatar name={name || "?"} src={image} size={72} />
         <div className="flex gap-2">
-          <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" className="sr-only" id="avatar" onChange={(e) => onAvatar(e.target.files?.[0])} />
-          <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => fileInput.current?.click()}>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+            className="sr-only"
+            id="avatar"
+            onChange={(e) => onAvatar(e.target.files?.[0])}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={uploading}
+            onClick={() => fileInput.current?.click()}
+          >
             {uploading ? "Uploading…" : "Change photo"}
           </Button>
-          {image ? <Button type="button" variant="ghost" size="sm" onClick={() => setImage(null)}>Remove</Button> : null}
+          {image ? (
+            <Button type="button" variant="ghost" size="sm" onClick={() => setImage(null)}>
+              Remove
+            </Button>
+          ) : null}
         </div>
       </div>
       <Field label="Name" htmlFor="name">
-        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} required />
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={80}
+          required
+        />
       </Field>
-      <Field label="Username" htmlFor="username" error={usernameError} hint={`Your profile: /${normalizeUsername(username)}`}>
+      <Field
+        label="Username"
+        htmlFor="username"
+        error={usernameError}
+        hint={`Your profile: /${normalizeUsername(username)}`}
+      >
         <Input
           id="username"
           value={username}
@@ -81,10 +109,16 @@ export function ProfileForm({
       <Field label="Bio" htmlFor="bio" hint="A line or two about you and what you write.">
         <Textarea id="bio" name="bio" defaultValue={initial.bio} maxLength={500} rows={4} />
       </Field>
-      <Field label="Email" htmlFor="email" hint="Used for signing in and password resets. Never shown publicly.">
+      <Field
+        label="Email"
+        htmlFor="email"
+        hint="Used for signing in and password resets. Never shown publicly."
+      >
         <Input id="email" value={initial.email} disabled readOnly />
       </Field>
-      <Button type="submit" disabled={pending || uploading}>{pending ? "Saving…" : "Save profile"}</Button>
+      <Button type="submit" disabled={pending || uploading}>
+        {pending ? "Saving…" : "Save profile"}
+      </Button>
     </form>
   );
 }

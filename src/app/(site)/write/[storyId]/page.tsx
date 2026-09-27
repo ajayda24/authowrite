@@ -12,7 +12,11 @@ export default async function StoryOverviewPage(props: PageProps<"/write/[storyI
 
   return (
     <div className="space-y-8">
-      <PublishStoryBanner storyId={story.id} status={story.status} publishedChapters={publishedChapters} />
+      <PublishStoryBanner
+        storyId={story.id}
+        status={story.status}
+        publishedChapters={publishedChapters}
+      />
       <ChapterList storyId={story.id} chapters={chapters} />
     </div>
   );

@@ -29,9 +29,7 @@ async function getInteractableStory(actor: Actor, storyId: string) {
     .limit(1);
   const visible =
     story &&
-    (story.status === "published" ||
-      story.status === "unlisted" ||
-      story.authorId === actor?.id);
+    (story.status === "published" || story.status === "unlisted" || story.authorId === actor?.id);
   if (!visible) throw new NotFoundError("Story");
   return story;
 }
@@ -40,7 +38,10 @@ export async function setLike(actor: Actor, storyId: string, liked: boolean) {
   const user = requireActor(actor);
   const story = await getInteractableStory(user, storyId);
   if (liked) {
-    await db.insert(storyLikes).values({ userId: user.id, storyId: story.id }).onConflictDoNothing();
+    await db
+      .insert(storyLikes)
+      .values({ userId: user.id, storyId: story.id })
+      .onConflictDoNothing();
   } else {
     await db
       .delete(storyLikes)
@@ -211,10 +212,7 @@ export async function listContinueReading(actor: Actor, limit = 6) {
     .innerJoin(users, eq(users.id, stories.authorId))
     .innerJoin(chapters, eq(chapters.id, readingProgress.chapterId))
     .where(
-      and(
-        eq(readingProgress.userId, user.id),
-        sql`${stories.status} in ('published', 'unlisted')`,
-      ),
+      and(eq(readingProgress.userId, user.id), sql`${stories.status} in ('published', 'unlisted')`),
     )
     .orderBy(desc(readingProgress.updatedAt))
     .limit(limit);

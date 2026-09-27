@@ -108,7 +108,10 @@ class ChapterSaver {
     this.inFlight = true;
     this.onState({ kind: "saving" });
     try {
-      const result = await saveChapterAction(this.chapterId, { ...draft, expectedRevision: this.revision });
+      const result = await saveChapterAction(this.chapterId, {
+        ...draft,
+        expectedRevision: this.revision,
+      });
       if (result.ok) {
         this.revision = result.data.revision;
         if (!this.pending) {

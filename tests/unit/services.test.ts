@@ -71,7 +71,13 @@ describe("stories", () => {
     await expect(createStory(null, { title: "x" })).rejects.toBeInstanceOf(UnauthenticatedError);
     await expect(getStoryWorkspace(other, story.id)).rejects.toBeInstanceOf(ForbiddenError);
     await expect(
-      updateStory(other, story.id, { title: "Stolen", description: "", genreSlug: null, language: "en", tags: [] }),
+      updateStory(other, story.id, {
+        title: "Stolen",
+        description: "",
+        genreSlug: null,
+        language: "en",
+        tags: [],
+      }),
     ).rejects.toBeInstanceOf(ForbiddenError);
     await expect(getStoryWorkspace(author, "not-a-uuid")).rejects.toBeInstanceOf(NotFoundError);
   });
@@ -91,7 +97,13 @@ describe("stories", () => {
     expect(updated.language).toBe("ml");
     expect(updated.tags).toEqual(["kerala-stories", "rain"]);
     await expect(
-      updateStory(author, story.id, { title: "x", description: "", genreSlug: "nope", language: "en", tags: [] }),
+      updateStory(author, story.id, {
+        title: "x",
+        description: "",
+        genreSlug: "nope",
+        language: "en",
+        tags: [],
+      }),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
@@ -111,7 +123,9 @@ describe("stories", () => {
   it("cannot be published without a published chapter", async () => {
     const author = await createUser();
     const { story } = await createStory(author, { title: "Empty" });
-    await expect(setStoryStatus(author, story.id, "published")).rejects.toBeInstanceOf(ValidationError);
+    await expect(setStoryStatus(author, story.id, "published")).rejects.toBeInstanceOf(
+      ValidationError,
+    );
   });
 
   it("hides drafts from everyone but the author", async () => {
@@ -139,7 +153,13 @@ describe("chapters", () => {
     const { firstChapterId } = await createStory(author, { title: "S" });
     const saved = await saveChapter(author, firstChapterId, {
       title: "Opening",
-      content: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "one two three" }] }, { type: "iframe" }] },
+      content: {
+        type: "doc",
+        content: [
+          { type: "paragraph", content: [{ type: "text", text: "one two three" }] },
+          { type: "iframe" },
+        ],
+      },
       expectedRevision: 0,
     });
     expect(saved.revision).toBe(1);
@@ -181,7 +201,9 @@ describe("chapters", () => {
     expect(first?.chapter.html).toBe("<p>The rain came early that year.</p>");
     expect(first?.next).toBeNull();
     expect(await getReaderChapter(reader, "ajay", "the-last-monsoon", draft.position)).toBeNull();
-    expect(await getReaderChapter(author, "ajay", "the-last-monsoon", draft.position)).not.toBeNull();
+    expect(
+      await getReaderChapter(author, "ajay", "the-last-monsoon", draft.position),
+    ).not.toBeNull();
   });
 });
 
@@ -193,7 +215,11 @@ describe("discovery", () => {
 
     const latest = await listStories({ sort: "latest" });
     expect(latest.stories.map((s) => s.title)).toEqual(["The Last Monsoon"]);
-    expect(latest.stories[0]).toMatchObject({ chapterCount: 1, wordCount: 6, href: "/ajay/the-last-monsoon" });
+    expect(latest.stories[0]).toMatchObject({
+      chapterCount: 1,
+      wordCount: 6,
+      href: "/ajay/the-last-monsoon",
+    });
 
     const results = await searchStories("monsoon");
     expect(results.map((s) => s.title)).toEqual(["The Last Monsoon"]);
@@ -238,7 +264,9 @@ describe("social", () => {
     const reader = await createUser();
     const { story } = await createStory(author, { title: "Private" });
     await expect(setLike(reader, story.id, true)).rejects.toBeInstanceOf(NotFoundError);
-    await expect(addComment(reader, { storyId: story.id, body: "hi" })).rejects.toBeInstanceOf(NotFoundError);
+    await expect(addComment(reader, { storyId: story.id, body: "hi" })).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
   });
 
   it("lets comment authors and story owners delete comments", async () => {
@@ -248,13 +276,19 @@ describe("social", () => {
     const comment = await addComment(reader, { storyId: story.id, body: "Beautiful." });
     await expect(deleteComment(stranger, comment.id)).rejects.toBeInstanceOf(ForbiddenError);
     await deleteComment(author, comment.id);
-    await expect(addComment(reader, { storyId: story.id, body: "   " })).rejects.toBeInstanceOf(ValidationError);
+    await expect(addComment(reader, { storyId: story.id, body: "   " })).rejects.toBeInstanceOf(
+      ValidationError,
+    );
   });
 
   it("remembers reading progress", async () => {
     const { story, firstChapterId } = await publishedStory();
     const reader = await createUser();
-    await saveReadingProgress(reader, { storyId: story.id, chapterId: firstChapterId, percent: 0.5 });
+    await saveReadingProgress(reader, {
+      storyId: story.id,
+      chapterId: firstChapterId,
+      percent: 0.5,
+    });
     await saveReadingProgress(reader, { storyId: story.id, chapterId: firstChapterId, percent: 2 });
     const page = await getPublicStory(reader, "ajay", "the-last-monsoon");
     expect(page?.viewer?.progress).toEqual({ position: 1, percent: 1 });
@@ -265,10 +299,19 @@ describe("profiles", () => {
   it("validates and updates the profile", async () => {
     const user = await createUser({ username: "first" });
     await createUser({ username: "taken" });
-    await expect(updateProfile(user, { name: "A", username: "taken", bio: "" })).rejects.toBeInstanceOf(ConflictError);
-    await expect(updateProfile(user, { name: "A", username: "settings", bio: "" })).rejects.toBeInstanceOf(ValidationError);
     await expect(
-      updateProfile(user, { name: "A", username: "first", bio: "", image: "https://evil.example/x.png" }),
+      updateProfile(user, { name: "A", username: "taken", bio: "" }),
+    ).rejects.toBeInstanceOf(ConflictError);
+    await expect(
+      updateProfile(user, { name: "A", username: "settings", bio: "" }),
+    ).rejects.toBeInstanceOf(ValidationError);
+    await expect(
+      updateProfile(user, {
+        name: "A",
+        username: "first",
+        bio: "",
+        image: "https://evil.example/x.png",
+      }),
     ).rejects.toBeInstanceOf(ValidationError);
     await updateProfile(user, { name: "Anna", username: "Anna_Writes", bio: "Hello" });
     const profile = await getProfile(null, "anna_writes");

@@ -27,7 +27,12 @@ export async function setFollowAction(userId: string, following: boolean) {
   return result;
 }
 
-export async function addCommentAction(input: { storyId: string; chapterId: string | null; body: string; path: string }) {
+export async function addCommentAction(input: {
+  storyId: string;
+  chapterId: string | null;
+  body: string;
+  path: string;
+}) {
   const viewer = await getViewer();
   const result = await run(async () => {
     await social.addComment(viewer, input);
@@ -43,7 +48,11 @@ export async function deleteCommentAction(commentId: string, path: string) {
   return result;
 }
 
-export async function saveProgressAction(input: { storyId: string; chapterId: string; percent: number }) {
+export async function saveProgressAction(input: {
+  storyId: string;
+  chapterId: string;
+  percent: number;
+}) {
   const viewer = await getViewer();
   if (!viewer) return { ok: true as const };
   return run(() => social.saveReadingProgress(viewer, input));

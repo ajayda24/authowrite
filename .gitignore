@@ -28,3 +28,4 @@ storage/
 *.pem
 npm-debug.log*
 pnpm-debug.log*
+dist/

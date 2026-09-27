@@ -55,7 +55,7 @@ export function StoryCover({
       <div className="absolute inset-[6%] flex flex-col border border-current/25 p-[8%]">
         <span
           className={cn(
-            "font-display leading-[1.15] font-medium hyphens-auto [overflow-wrap:break-word]",
+            "font-display leading-[1.15] font-medium [overflow-wrap:break-word] hyphens-auto",
             size === "sm" && "line-clamp-5 text-[11px]",
             size === "md" && "line-clamp-5 text-sm",
             size === "lg" && "line-clamp-6 text-2xl",
@@ -64,7 +64,9 @@ export function StoryCover({
           {title}
         </span>
         {author && size !== "sm" ? (
-          <span className={cn("mt-auto truncate opacity-75", size === "lg" ? "text-sm" : "text-[10px]")}>
+          <span
+            className={cn("mt-auto truncate opacity-75", size === "lg" ? "text-sm" : "text-[10px]")}
+          >
             {author}
           </span>
         ) : null}

@@ -21,20 +21,27 @@ export async function Comments({
   return (
     <section aria-labelledby="comments-heading" className="space-y-6">
       <h2 id="comments-heading" className="font-display text-2xl font-semibold">
-        {comments.length > 0 ? `${comments.length} ${comments.length === 1 ? "comment" : "comments"}` : "Comments"}
+        {comments.length > 0
+          ? `${comments.length} ${comments.length === 1 ? "comment" : "comments"}`
+          : "Comments"}
       </h2>
       {viewerId ? (
         <CommentForm storyId={storyId} chapterId={chapterId} path={path} />
       ) : (
-        <p className="rounded-md border px-4 py-3 text-sm text-muted-foreground">
-          <Link href={`/sign-in?next=${encodeURIComponent(path)}`} className="font-medium text-foreground underline underline-offset-4">
+        <p className="text-muted-foreground rounded-md border px-4 py-3 text-sm">
+          <Link
+            href={`/sign-in?next=${encodeURIComponent(path)}`}
+            className="text-foreground font-medium underline underline-offset-4"
+          >
             Sign in
           </Link>{" "}
           to leave a comment.
         </p>
       )}
       {comments.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No comments yet. Be the first to share what you thought.</p>
+        <p className="text-muted-foreground text-sm">
+          No comments yet. Be the first to share what you thought.
+        </p>
       ) : (
         <ul className="space-y-6">
           {comments.map((comment) => (
@@ -44,17 +51,26 @@ export async function Comments({
               </Link>
               <div className="min-w-0 flex-1">
                 <p className="text-sm">
-                  <Link href={`/${comment.author.username}`} className="font-medium hover:underline">
+                  <Link
+                    href={`/${comment.author.username}`}
+                    className="font-medium hover:underline"
+                  >
                     {comment.author.name}
                   </Link>
                   {comment.author.id === storyAuthorId ? (
-                    <span className="ml-1.5 rounded-sm bg-accent-soft px-1 py-px text-[11px] font-medium text-accent">Author</span>
+                    <span className="bg-accent-soft text-accent ml-1.5 rounded-sm px-1 py-px text-[11px] font-medium">
+                      Author
+                    </span>
                   ) : null}
-                  <span className="ml-2 text-subtle-foreground">
-                    <time dateTime={comment.createdAt.toISOString()}>{formatRelative(comment.createdAt)}</time>
+                  <span className="text-subtle-foreground ml-2">
+                    <time dateTime={comment.createdAt.toISOString()}>
+                      {formatRelative(comment.createdAt)}
+                    </time>
                   </span>
                 </p>
-                <p className="mt-1 leading-relaxed whitespace-pre-line [overflow-wrap:anywhere]">{comment.body}</p>
+                <p className="mt-1 leading-relaxed [overflow-wrap:anywhere] whitespace-pre-line">
+                  {comment.body}
+                </p>
                 {viewerId && (viewerId === comment.author.id || viewerId === storyAuthorId) ? (
                   <DeleteCommentButton commentId={comment.id} path={path} />
                 ) : null}

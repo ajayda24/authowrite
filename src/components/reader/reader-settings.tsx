@@ -63,17 +63,35 @@ export function ReaderSettings({ targetId }: { targetId: string }) {
       </PopoverTrigger>
       <PopoverContent className="space-y-5">
         <div>
-          <p className="mb-2 text-xs font-medium text-muted-foreground">Text size</p>
+          <p className="text-muted-foreground mb-2 text-xs font-medium">Text size</p>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon-sm" aria-label="Smaller text" disabled={prefs.size === 0} onClick={() => update({ size: prefs.size - 1 })}>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Smaller text"
+              disabled={prefs.size === 0}
+              onClick={() => update({ size: prefs.size - 1 })}
+            >
               <MinusIcon />
             </Button>
             <div className="flex flex-1 justify-center gap-1" aria-hidden="true">
               {SIZES.map((_, i) => (
-                <span key={i} className={cn("h-1.5 w-4 rounded-full bg-border", i <= prefs.size && "bg-foreground")} />
+                <span
+                  key={i}
+                  className={cn(
+                    "bg-border h-1.5 w-4 rounded-full",
+                    i <= prefs.size && "bg-foreground",
+                  )}
+                />
               ))}
             </div>
-            <Button variant="outline" size="icon-sm" aria-label="Larger text" disabled={prefs.size === SIZES.length - 1} onClick={() => update({ size: prefs.size + 1 })}>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Larger text"
+              disabled={prefs.size === SIZES.length - 1}
+              onClick={() => update({ size: prefs.size + 1 })}
+            >
               <PlusIcon />
             </Button>
           </div>
@@ -81,17 +99,24 @@ export function ReaderSettings({ targetId }: { targetId: string }) {
         <Segmented
           label="Font"
           value={prefs.font}
-          options={[{ value: "serif", label: "Serif", className: "font-display" }, { value: "sans", label: "Sans", className: "font-sans" }]}
+          options={[
+            { value: "serif", label: "Serif", className: "font-display" },
+            { value: "sans", label: "Sans", className: "font-sans" },
+          ]}
           onChange={(font) => update({ font })}
         />
         <Segmented
           label="Line width"
           value={prefs.width}
-          options={[{ value: "narrow", label: "Narrow" }, { value: "normal", label: "Normal" }, { value: "wide", label: "Wide" }]}
+          options={[
+            { value: "narrow", label: "Narrow" },
+            { value: "normal", label: "Normal" },
+            { value: "wide", label: "Wide" },
+          ]}
           onChange={(width) => update({ width })}
         />
         <div>
-          <p className="mb-2 text-xs font-medium text-muted-foreground">Theme</p>
+          <p className="text-muted-foreground mb-2 text-xs font-medium">Theme</p>
           <ThemePicker />
         </div>
       </PopoverContent>
@@ -112,8 +137,14 @@ function Segmented<T extends string>({
 }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-medium text-muted-foreground" id={`seg-${label}`}>{label}</p>
-      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex gap-1 rounded-md bg-muted p-1">
+      <p className="text-muted-foreground mb-2 text-xs font-medium" id={`seg-${label}`}>
+        {label}
+      </p>
+      <div
+        role="radiogroup"
+        aria-labelledby={`seg-${label}`}
+        className="bg-muted flex gap-1 rounded-md p-1"
+      >
         {options.map((option) => (
           <button
             key={option.value}
@@ -122,7 +153,7 @@ function Segmented<T extends string>({
             aria-checked={value === option.value}
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex-1 rounded-sm py-1 text-sm text-muted-foreground",
+              "text-muted-foreground flex-1 rounded-sm py-1 text-sm",
               option.className,
               value === option.value && "bg-surface text-foreground shadow-sm",
             )}

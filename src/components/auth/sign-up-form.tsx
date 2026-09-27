@@ -39,7 +39,8 @@ export function SignUpForm({ next }: { next: string }) {
       setPending(false);
       const message = error.message ?? "";
       if (/username/i.test(message)) setUsernameError("That username is taken. Try another.");
-      else if (/exist/i.test(message)) setError("An account with that email already exists. Try signing in.");
+      else if (/exist/i.test(message))
+        setError("An account with that email already exists. Try signing in.");
       else setError(message || "We couldn't create your account. Please try again.");
       return;
     }
@@ -50,14 +51,20 @@ export function SignUpForm({ next }: { next: string }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <FormError message={error} />
-      <Field label="Your name" htmlFor="name" hint="Shown on your stories. You can change it later.">
+      <Field
+        label="Your name"
+        htmlFor="name"
+        hint="Shown on your stories. You can change it later."
+      >
         <Input id="name" name="name" autoComplete="name" required autoFocus />
       </Field>
       <Field
         label="Username"
         htmlFor="username"
         error={usernameError}
-        hint={username ? `Your page: /${normalizeUsername(username)}` : "Letters, numbers, - and _."}
+        hint={
+          username ? `Your page: /${normalizeUsername(username)}` : "Letters, numbers, - and _."
+        }
       >
         <Input
           id="username"
@@ -79,7 +86,14 @@ export function SignUpForm({ next }: { next: string }) {
         <Input id="email" name="email" type="email" autoComplete="email" required />
       </Field>
       <Field label="Password" htmlFor="password" hint="At least 8 characters.">
-        <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+        />
       </Field>
       <Button type="submit" className="w-full" size="lg" disabled={pending}>
         {pending ? "Creating your account…" : "Create account"}

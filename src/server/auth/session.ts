@@ -30,5 +30,7 @@ export async function requireViewer(returnTo?: string): Promise<Viewer> {
   if (!viewer) {
     redirect(returnTo ? `/sign-in?next=${encodeURIComponent(returnTo)}` : "/sign-in");
   }
+  // Accounts created through GitHub/Google have no username yet; ask for one first.
+  if (!viewer.username && returnTo !== "/settings") redirect("/settings");
   return viewer;
 }

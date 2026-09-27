@@ -23,7 +23,7 @@ export function ChapterMenu({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-h-[70vh] w-80 overflow-y-auto p-2">
-        <p className="px-2 pt-1 pb-2 text-xs font-medium text-muted-foreground">Chapters</p>
+        <p className="text-muted-foreground px-2 pt-1 pb-2 text-xs font-medium">Chapters</p>
         <ol>
           {chapters.map((c) => (
             <li key={c.id}>
@@ -31,13 +31,17 @@ export function ChapterMenu({
                 href={`${base}/${c.position}`}
                 aria-current={c.position === current ? "page" : undefined}
                 className={cn(
-                  "flex gap-3 rounded-sm px-2 py-1.5 text-sm hover:bg-muted",
+                  "hover:bg-muted flex gap-3 rounded-sm px-2 py-1.5 text-sm",
                   c.position === current && "bg-muted font-medium",
                 )}
               >
-                <span className="w-5 text-right text-subtle-foreground tabular-nums">{c.position}</span>
+                <span className="text-subtle-foreground w-5 text-right tabular-nums">
+                  {c.position}
+                </span>
                 <span className="flex-1 truncate">{c.title || `Chapter ${c.position}`}</span>
-                {c.status === "draft" ? <span className="text-xs text-subtle-foreground">Draft</span> : null}
+                {c.status === "draft" ? (
+                  <span className="text-subtle-foreground text-xs">Draft</span>
+                ) : null}
               </Link>
             </li>
           ))}

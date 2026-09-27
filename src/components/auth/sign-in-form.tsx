@@ -25,7 +25,11 @@ export function SignInForm({ next }: { next: string }) {
       : await authClient.signIn.username({ username: identifier, password });
     if (error) {
       setPending(false);
-      setError(error.status === 429 ? "Too many attempts. Please wait a minute." : "That email/username and password don't match.");
+      setError(
+        error.status === 429
+          ? "Too many attempts. Please wait a minute."
+          : "That email/username and password don't match.",
+      );
       return;
     }
     router.push(next);
@@ -41,9 +45,19 @@ export function SignInForm({ next }: { next: string }) {
       <Field
         label="Password"
         htmlFor="password"
-        hint={<Link href="/forgot-password" className="hover:text-foreground hover:underline">Forgot your password?</Link>}
+        hint={
+          <Link href="/forgot-password" className="hover:text-foreground hover:underline">
+            Forgot your password?
+          </Link>
+        }
       >
-        <Input id="password" name="password" type="password" autoComplete="current-password" required />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+        />
       </Field>
       <Button type="submit" className="w-full" size="lg" disabled={pending}>
         {pending ? "Signing in…" : "Sign in"}

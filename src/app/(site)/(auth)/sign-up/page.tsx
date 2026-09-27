@@ -15,12 +15,15 @@ export default async function SignUpPage(props: PageProps<"/sign-up">) {
   if (await getViewer()) redirect(target);
   return (
     <>
-      <AuthHeading title="Start writing" subtitle="Create a free account. It takes less than a minute." />
+      <AuthHeading
+        title="Start writing"
+        subtitle="Create a free account. It takes less than a minute."
+      />
       <SocialButtons providers={enabledProviders()} next={target} />
       <SignUpForm next={target} />
-      <p className="mt-8 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-8 text-center text-sm">
         Already have an account?{" "}
-        <Link href="/sign-in" className="font-medium text-foreground underline underline-offset-4">
+        <Link href="/sign-in" className="text-foreground font-medium underline underline-offset-4">
           Sign in
         </Link>
       </p>

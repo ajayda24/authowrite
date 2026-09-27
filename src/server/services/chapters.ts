@@ -95,7 +95,11 @@ export async function saveChapter(
       ...(data.title !== undefined ? { title: data.title } : {}),
     })
     .where(and(eq(chapters.id, chapter.id), eq(chapters.revision, data.expectedRevision)))
-    .returning({ revision: chapters.revision, wordCount: chapters.wordCount, updatedAt: chapters.updatedAt });
+    .returning({
+      revision: chapters.revision,
+      wordCount: chapters.wordCount,
+      updatedAt: chapters.updatedAt,
+    });
 
   if (!updated) {
     throw new ConflictError(
@@ -123,7 +127,8 @@ export async function setChapterStatus(
     .update(chapters)
     .set({
       status,
-      publishedAt: status === "published" ? (chapter.publishedAt ?? new Date()) : chapter.publishedAt,
+      publishedAt:
+        status === "published" ? (chapter.publishedAt ?? new Date()) : chapter.publishedAt,
     })
     .where(eq(chapters.id, chapter.id));
 }
@@ -247,11 +252,7 @@ export async function getReaderChapter(
   const index = toc.findIndex((c) => c.position === position);
   if (index === -1) return null;
 
-  const [chapter] = await db
-    .select()
-    .from(chapters)
-    .where(eq(chapters.id, toc[index].id))
-    .limit(1);
+  const [chapter] = await db.select().from(chapters).where(eq(chapters.id, toc[index].id)).limit(1);
 
   return {
     story: { ...row.story, coverUrl: fileUrl(row.story.coverKey), genreName: row.genreName },

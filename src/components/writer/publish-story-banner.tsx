@@ -19,12 +19,18 @@ export function PublishStoryBanner({
 
   const ready = publishedChapters > 0;
   return (
-    <div className="flex flex-col gap-3 rounded-md border bg-muted/60 px-4 py-3.5 sm:flex-row sm:items-center">
+    <div className="bg-muted/60 flex flex-col gap-3 rounded-md border px-4 py-3.5 sm:flex-row sm:items-center">
       <p className="flex-1 text-sm leading-relaxed">
         {ready ? (
-          <>This story is a <strong>draft</strong>. Only you can see it. Publish it when you’re ready for readers.</>
+          <>
+            This story is a <strong>draft</strong>. Only you can see it. Publish it when you’re
+            ready for readers.
+          </>
         ) : (
-          <>This story is a <strong>draft</strong>, visible only to you. Open a chapter and press <strong>Publish</strong> when it’s ready.</>
+          <>
+            This story is a <strong>draft</strong>, visible only to you. Open a chapter and press{" "}
+            <strong>Publish</strong> when it’s ready.
+          </>
         )}
       </p>
       {ready ? (

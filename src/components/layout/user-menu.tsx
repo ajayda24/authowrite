@@ -1,6 +1,12 @@
 "use client";
 
-import { BookmarkIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -32,7 +38,7 @@ export function UserMenu({
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="text-foreground">
           <span className="block truncate font-medium">{viewer.name}</span>
-          <span className="block truncate text-muted-foreground">@{viewer.username}</span>
+          <span className="text-muted-foreground block truncate">@{viewer.username}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

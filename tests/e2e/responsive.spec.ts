@@ -3,7 +3,9 @@ import { expect, test } from "@playwright/test";
 for (const path of ["/", "/explore", "/about", "/sign-in"]) {
   test(`${path} has no horizontal overflow on small screens`, async ({ page }) => {
     await page.goto(path);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }

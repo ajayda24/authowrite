@@ -10,7 +10,7 @@ import { UserMenu } from "./user-menu";
 export async function SiteHeader() {
   const viewer = await getViewer();
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/92 backdrop-blur-sm supports-[backdrop-filter]:bg-background/80">
+    <header className="bg-background/92 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
         <Logo />
         <nav aria-label="Main" className="hidden md:block">

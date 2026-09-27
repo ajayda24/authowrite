@@ -25,7 +25,7 @@ export function DialogContent({
       <DialogPrimitive.Content className={cn(panel, className)} {...props}>
         {children}
         <DialogPrimitive.Close
-          className="absolute top-4 right-4 rounded-sm p-1 text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-sm p-1"
           aria-label="Close"
         >
           <XIcon className="size-4" />
@@ -35,8 +35,16 @@ export function DialogContent({
   );
 }
 
-export function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn("font-display text-xl font-semibold", className)} {...props} />;
+export function DialogTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      className={cn("font-display text-xl font-semibold", className)}
+      {...props}
+    />
+  );
 }
 
 export function DialogDescription({
@@ -45,14 +53,19 @@ export function DialogDescription({
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn("mt-1.5 text-sm leading-relaxed text-muted-foreground", className)}
+      className={cn("text-muted-foreground mt-1.5 text-sm leading-relaxed", className)}
       {...props}
     />
   );
 }
 
 export function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
+  return (
+    <div
+      className={cn("mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+      {...props}
+    />
+  );
 }
 
 /** Confirmation dialog for destructive actions. */
@@ -75,13 +88,20 @@ export function ConfirmDialog({
       <AlertPrimitive.Portal>
         <AlertPrimitive.Overlay className={overlay} />
         <AlertPrimitive.Content className={panel}>
-          <AlertPrimitive.Title className="font-display text-xl font-semibold">{title}</AlertPrimitive.Title>
-          <AlertPrimitive.Description className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          <AlertPrimitive.Title className="font-display text-xl font-semibold">
+            {title}
+          </AlertPrimitive.Title>
+          <AlertPrimitive.Description className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
             {description}
           </AlertPrimitive.Description>
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <AlertPrimitive.Cancel className={buttonVariants({ variant: "outline" })}>Cancel</AlertPrimitive.Cancel>
-            <AlertPrimitive.Action className={buttonVariants({ variant: "destructive" })} onClick={onConfirm}>
+            <AlertPrimitive.Cancel className={buttonVariants({ variant: "outline" })}>
+              Cancel
+            </AlertPrimitive.Cancel>
+            <AlertPrimitive.Action
+              className={buttonVariants({ variant: "destructive" })}
+              onClick={onConfirm}
+            >
               {confirmLabel}
             </AlertPrimitive.Action>
           </div>

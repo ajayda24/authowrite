@@ -6,7 +6,11 @@ export async function uploadImageFile(file: File): Promise<{ url: string; key: s
   const body = new FormData();
   body.append("file", file);
   const response = await fetch("/api/uploads", { method: "POST", body });
-  const data = (await response.json().catch(() => ({}))) as { url?: string; key?: string; error?: string };
+  const data = (await response.json().catch(() => ({}))) as {
+    url?: string;
+    key?: string;
+    error?: string;
+  };
   if (!response.ok || !data.url || !data.key) throw new Error(data.error ?? "Upload failed.");
   return { url: data.url, key: data.key };
 }

@@ -17,7 +17,9 @@ export const storySummaryFields = {
   status: stories.status,
   genreSlug: stories.genreSlug,
   publishedAt: stories.publishedAt,
-  genreName: sql<string | null>`(select ${genres.name} from ${genres} where ${genres.slug} = ${stories.genreSlug})`,
+  genreName: sql<
+    string | null
+  >`(select ${genres.name} from ${genres} where ${genres.slug} = ${stories.genreSlug})`,
   authorName: users.name,
   authorUsername: users.username,
   authorImage: users.image,

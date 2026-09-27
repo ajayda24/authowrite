@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-4xl font-semibold">Settings</h1>
-      <p className="mt-2 text-muted-foreground">How you appear to readers.</p>
+      <p className="text-muted-foreground mt-2">How you appear to readers.</p>
       <ProfileForm
         initial={{
           name: profile.name,
