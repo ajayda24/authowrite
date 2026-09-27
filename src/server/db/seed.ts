@@ -9,7 +9,7 @@
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import type { DocNode } from "@/lib/content/types";
-import { auth } from "@/server/auth";
+import { getAuth } from "@/server/auth";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
 import { addChapter, publishChapter, saveChapter } from "@/server/services/chapters";
@@ -177,7 +177,7 @@ async function main() {
 
   const ids = new Map<string, string>();
   for (const author of AUTHORS) {
-    const result = await auth.api.signUpEmail({
+    const result = await getAuth().api.signUpEmail({
       body: {
         name: author.name,
         email: author.email,

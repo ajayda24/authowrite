@@ -6,6 +6,18 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Builds no longer fail when environment variables are missing or blank (e.g. on Vercel).
+  Configuration is now validated when the server starts, blank values fall back to defaults, and
+  invalid settings produce a clear message naming the variable to fix.
+
+### Added
+
+- Vercel support: `APP_URL` defaults to the Vercel production URL, migrations run in
+  `vercel-build`, and a warning appears if local file storage is used on Vercel.
+- "Deploying to Vercel" section in the self-hosting guide.
+
 ## [0.1.0] — 2026-09-27 — V1 Foundation
 
 ### Added
