@@ -1,26 +1,257 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/literata/wght.css";
+@import "@fontsource-variable/literata/wght-italic.css";
+@import "@fontsource-variable/noto-serif-malayalam/wght.css";
+@import "@fontsource-variable/noto-sans-malayalam/wght.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens. Calm, warm "paper and ink" palette with a single ink-blue
+ * accent. Three themes: light (default), sepia (for long reading) and dark.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfaf7;
+  --foreground: #1d1c1a;
+  --surface: #ffffff;
+  --muted: #f2f0eb;
+  --muted-foreground: #66625a;
+  --subtle-foreground: #6f6a60;
+  --border: #e5e1d8;
+  --border-strong: #d3cdc1;
+  --accent: #28497a;
+  --accent-foreground: #ffffff;
+  --accent-soft: #e8edf5;
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --success: #2f6b3a;
+  --ring: #28497a;
+  --selection: #d7e1f0;
+  --shadow: 0 1px 2px rgb(29 28 26 / 0.06), 0 4px 16px rgb(29 28 26 / 0.06);
+  color-scheme: light;
+}
+
+.sepia {
+  --background: #f5eddc;
+  --foreground: #3a2f20;
+  --surface: #faf4e6;
+  --muted: #ece2cc;
+  --muted-foreground: #6e5f47;
+  --subtle-foreground: #6f5f44;
+  --border: #e0d3b8;
+  --border-strong: #cfbe9c;
+  --accent: #7a4a1e;
+  --accent-foreground: #fffaf0;
+  --accent-soft: #eddcc2;
+  --ring: #7a4a1e;
+  --selection: #e6d2ae;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #141311;
+  --foreground: #e9e5dd;
+  --surface: #1b1a17;
+  --muted: #22211d;
+  --muted-foreground: #a9a397;
+  --subtle-foreground: #948f84;
+  --border: #2e2c27;
+  --border-strong: #3d3a34;
+  --accent: #9dbbe8;
+  --accent-foreground: #0f1a2b;
+  --accent-soft: #1f2a3a;
+  --destructive: #f07a6e;
+  --destructive-foreground: #1b0a08;
+  --success: #7fc28a;
+  --ring: #9dbbe8;
+  --selection: #2a3a55;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.3);
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-ring: var(--ring);
+
+  --font-sans: "Inter Variable", "Noto Sans Malayalam Variable", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-serif: "Literata Variable", "Noto Serif Malayalam Variable", ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 7px;
+  --shadow-soft: var(--shadow);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--selection);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility font-display {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
+}
+
+/*
+ * Long-form story typography, shared by the reader and the editor so that
+ * what writers see is what readers get.
+ */
+@layer components {
+  .story-prose {
+    --story-size: 1.1875rem;
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-size: var(--story-size);
+    line-height: 1.75;
+    color: var(--foreground);
+    overflow-wrap: break-word;
+    hanging-punctuation: first;
+  }
+  .story-prose[data-font="sans"] {
+    font-family: var(--font-sans);
+    line-height: 1.7;
+  }
+  .story-prose:lang(ml) {
+    line-height: 1.95;
+  }
+  .story-prose > * + * {
+    margin-top: 1.1em;
+  }
+  .story-prose h2 {
+    font-size: 1.45em;
+    line-height: 1.3;
+    font-weight: 600;
+    margin-top: 2em;
+    letter-spacing: -0.01em;
+  }
+  .story-prose h3 {
+    font-size: 1.2em;
+    line-height: 1.35;
+    font-weight: 600;
+    margin-top: 1.8em;
+  }
+  .story-prose h4 {
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 1.6em;
+  }
+  .story-prose blockquote {
+    border-left: 2px solid var(--border-strong);
+    padding-left: 1.1em;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+  .story-prose ul {
+    list-style: disc;
+    padding-left: 1.4em;
+  }
+  .story-prose ol {
+    list-style: decimal;
+    padding-left: 1.4em;
+  }
+  .story-prose li + li {
+    margin-top: 0.35em;
+  }
+  .story-prose li > p + p {
+    margin-top: 0.5em;
+  }
+  .story-prose a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .story-prose hr {
+    border: 0;
+    margin: 2.25em auto;
+    height: auto;
+    overflow: visible;
+    text-align: center;
+  }
+  .story-prose hr::before {
+    content: "*   *   *";
+    display: block;
+    white-space: pre;
+    line-height: 1;
+    color: var(--subtle-foreground);
+  }
+  .story-prose figure,
+  .story-prose img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .story-prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+  }
+
+  /* TipTap editor specifics */
+  .story-prose.tiptap {
+    outline: none;
+    min-height: 60vh;
+  }
+  .story-prose.tiptap p.is-editor-empty:first-child::before,
+  .story-prose.tiptap p.is-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    color: var(--subtle-foreground);
+  }
+  .story-prose.tiptap img.ProseMirror-selectednode {
+    outline: 2px solid var(--ring);
+  }
 }

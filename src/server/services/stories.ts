@@ -375,12 +375,13 @@ async function getViewerStoryState(userId: string, storyId: string, authorId: st
   };
 }
 
-/** Increments the view counter. Callers debounce per visitor. */
+/** Increments the view counter of a public story. Callers debounce per visitor. */
 export async function recordStoryView(storyId: string) {
+  if (!z.string().uuid().safeParse(storyId).success) return;
   await db
     .update(stories)
     .set({ viewCount: sql`${stories.viewCount} + 1`, updatedAt: sql`${stories.updatedAt}` })
-    .where(eq(stories.id, storyId));
+    .where(and(eq(stories.id, storyId), inArray(stories.status, ["published", "unlisted"])));
 }
 
 export async function listGenres() {
