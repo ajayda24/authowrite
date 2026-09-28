@@ -172,8 +172,7 @@ export function compareStates(before: HistoryState, after: HistoryState): StoryC
 
   const meta = compareMeta(before.meta, after.meta);
   const identical =
-    meta.length === 0 &&
-    changes.every((c) => c.change === "unchanged" && !c.renamed && !c.moved);
+    meta.length === 0 && changes.every((c) => c.change === "unchanged" && !c.renamed && !c.moved);
 
   return {
     chapters: changes,

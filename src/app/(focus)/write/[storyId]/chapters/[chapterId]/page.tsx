@@ -27,6 +27,7 @@ export default async function ChapterEditorPage(
         content: chapter.content as DocNode,
         revision: chapter.revision,
         status: chapter.status,
+        publishedRevision: chapter.publishedRevision,
         position: chapter.position,
       }}
       story={{ id: story.id, title: story.title, status: story.status, language: story.language }}

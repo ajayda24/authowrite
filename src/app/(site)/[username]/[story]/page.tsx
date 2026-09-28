@@ -156,6 +156,17 @@ export default async function StoryPage(props: PageProps<"/[username]/[story]">)
                 <dd>Published {formatDate(story.publishedAt)}</dd>
               </div>
             ) : null}
+            {data.latestVersion ? (
+              <div>
+                <dt className="sr-only">Last updated</dt>
+                <dd>
+                  <Link href={`${base}/history`} className="underline-offset-4 hover:underline">
+                    Updated {formatDate(data.latestVersion.createdAt)} · Version{" "}
+                    {data.latestVersion.number}
+                  </Link>
+                </dd>
+              </div>
+            ) : null}
           </dl>
 
           {tags.length > 0 ? (

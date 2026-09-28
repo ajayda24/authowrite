@@ -82,6 +82,20 @@ export default async function ReaderPage(props: PageProps<"/[username]/[story]/[
         </div>
       </header>
 
+      {data.previewingDraft ? (
+        <div role="note" className="bg-accent-soft border-b">
+          <p className="mx-auto max-w-[40rem] px-5 py-2.5 text-sm">
+            You’re previewing your latest draft. Readers still see the version you last published —{" "}
+            <Link
+              href={`/write/${story.id}/chapters/${chapter.id}`}
+              className="font-medium underline underline-offset-4"
+            >
+              publish your changes
+            </Link>{" "}
+            when you’re ready.
+          </p>
+        </div>
+      ) : null}
       <main id="main" className="px-5 pt-14 pb-20 sm:pt-20">
         <article lang={story.language} className="mx-auto max-w-[40rem]">
           <header className="mb-12 text-center">

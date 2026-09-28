@@ -61,9 +61,11 @@ export async function saveChapterAction(
   });
 }
 
-export async function publishChapterAction(chapterId: string, publishStory: boolean) {
+export async function publishChapterAction(chapterId: string, publishStory: boolean, message = "") {
   const viewer = await getViewer();
-  const result = await run(() => chapters.publishChapter(viewer, chapterId, { publishStory }));
+  const result = await run(() =>
+    chapters.publishChapter(viewer, chapterId, { publishStory, message }),
+  );
   revalidatePath("/", "layout");
   return result;
 }
