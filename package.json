@@ -1,6 +1,6 @@
 {
   "name": "authowrite",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Git for stories, without making writers use Git. An open-source platform to write, publish and discover stories.",
   "license": "AGPL-3.0-only",
   "engines": {

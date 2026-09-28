@@ -15,6 +15,13 @@
       "when": 1790518609968,
       "tag": "0001_seed_genres",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790578882456,
+      "tag": "0002_story_history",
+      "breakpoints": true
     }
   ]
 }

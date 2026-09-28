@@ -95,6 +95,15 @@ export const chapters = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     /** Incremented on every content save; used for optimistic concurrency. */
     revision: integer("revision").notNull().default(0),
+    /**
+     * What readers see. Copied from the working fields above when the writer
+     * publishes, so later edits stay private until they publish again.
+     */
+    publishedContent: jsonb("published_content").$type<DocNode>(),
+    publishedTitle: text("published_title"),
+    publishedWordCount: integer("published_word_count").notNull().default(0),
+    /** The `revision` that was last published; differs when there are unpublished edits. */
+    publishedRevision: integer("published_revision"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()

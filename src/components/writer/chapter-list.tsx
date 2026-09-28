@@ -9,6 +9,7 @@ import {
   PencilIcon,
   PlusIcon,
   TrashIcon,
+  UploadIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -47,6 +48,7 @@ interface ChapterItem {
   status: "draft" | "published";
   wordCount: number;
   updatedAt: Date;
+  hasUnpublishedChanges: boolean;
 }
 
 export function ChapterList({ storyId, chapters }: { storyId: string; chapters: ChapterItem[] }) {
@@ -93,6 +95,9 @@ export function ChapterList({ storyId, chapters }: { storyId: string; chapters: 
               </Link>
               <p className="text-muted-foreground text-[13px]">
                 {formatCount(chapter.wordCount)} words · edited {formatRelative(chapter.updatedAt)}
+                {chapter.hasUnpublishedChanges ? (
+                  <span className="text-accent"> · changes not published yet</span>
+                ) : null}
               </p>
             </div>
             <Badge variant={chapter.status === "published" ? "published" : "draft"}>
@@ -144,6 +149,15 @@ function ChapterMenu({
           <DropdownMenuItem onSelect={() => setRenaming(true)}>
             <PencilIcon /> Rename
           </DropdownMenuItem>
+          {chapter.hasUnpublishedChanges ? (
+            <DropdownMenuItem
+              onSelect={() =>
+                perform(() => setChapterStatusAction(chapter.id, "published"), "Changes published.")
+              }
+            >
+              <UploadIcon /> Publish changes
+            </DropdownMenuItem>
+          ) : null}
           {chapter.status === "published" ? (
             <DropdownMenuItem
               onSelect={() =>

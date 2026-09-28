@@ -42,7 +42,8 @@ Services throw typed domain errors (`NotFoundError`, `ForbiddenError`, `Validati
 ## Data model (V1)
 
 ```
-users ─┬─< stories ─┬─< chapters         (content: ProseMirror JSON)
+users ─┬─< stories ─┬─< chapters         (draft + published copy, ProseMirror JSON)
+       │            ├─< story_versions ─> content_blobs   (history, V2)
        │            ├─< story_tags >── tags
        │            ├─< story_likes, bookmarks, comments
        │            └── genres
@@ -60,19 +61,35 @@ sessions, accounts, verifications — Better Auth
 - Search uses a generated `tsvector` column with the language-neutral `simple` configuration and a
   GIN index ([ADR 0006](adr/0006-postgres-full-text-search.md)).
 
+### Story history (V2)
+
+See [ADR 0009](adr/0009-story-history.md).
+
+```
+chapters (working draft) ──publish──► chapters.published_* (what readers see)
+     │                                     │
+     └──── recordVersion() ◄───────────────┘   in the same transaction
+                 │
+        story_versions (number, kind, message, meta, chapters[] → blob hash)
+                 │
+          content_blobs (sha256 → chapter document, stored once)
+```
+
+- `src/server/services/versions.ts`: captures a story (`working` or `published` view) and records
+  a version. It has no dependencies on other services, so publishing and restoring can use it.
+- `src/server/services/history.ts`: list, view, compare, save, restore (story or chapter), and
+  the public list of published versions.
+- `src/lib/history/compare.ts`: pure, framework-free comparison of two story states.
+
 ### Designed for what comes next
 
-V1 deliberately doesn't implement versioning, but the model is shaped for it:
-
-- **V2 history:** a story is metadata + an ordered list of self-contained chapter documents, so a
-  snapshot is simply a copy of `{story fields, chapters[]}` into a `story_versions` table.
-  `chapters.revision` already counts edits.
-- **V3 branches/forks:** stories are addressed by `(author, slug)` and by UUID, so a fork can be a
-  new story row with a `forked_from` reference without changing URLs.
+- **V3 branches/forks:** a branch or fork can start from any version (a complete, immutable
+  snapshot). Chapter ids and content hashes make readable diffs and three-way merges possible.
 - **V6 export:** content is stored in an open JSON format that maps cleanly to Markdown and HTML
-  ([content-format.md](content-format.md)).
+  ([content-format.md](content-format.md)). Versions export naturally as a Git-like history.
 - **V9 federation:** services map naturally onto ActivityPub concepts (users → actors, stories and
-  chapters → objects, follows → Follow, likes → Like, comments → Note replies).
+  chapters → objects, follows → Follow, likes → Like, comments → Note replies). Published versions
+  map onto `Update` activities.
 
 ## Content pipeline
 

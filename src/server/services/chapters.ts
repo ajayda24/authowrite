@@ -12,7 +12,13 @@ import { EMPTY_DOC, type DocNode } from "@/lib/content/types";
 import { fileUrl } from "@/lib/files";
 import { ConflictError, NotFoundError, type Actor } from "./errors";
 import { getEditableStory } from "./stories";
+import { recordVersion } from "./versions";
 import { parseInput } from "./validation";
+
+const publishMessageSchema = z
+  .string()
+  .trim()
+  .max(500, "Keep the description under 500 characters.");
 
 const chapterTitleSchema = z
   .string()
@@ -116,38 +122,50 @@ export async function renameChapter(actor: Actor, chapterId: string, title: stri
   await db.update(chapters).set({ title: clean }).where(eq(chapters.id, chapter.id));
 }
 
+/**
+ * Publishes or unpublishes a chapter from the chapter list. Publishing goes
+ * through `publishChapter` so readers get the current text and the story
+ * history records it.
+ */
 export async function setChapterStatus(
   actor: Actor,
   chapterId: string,
   status: "draft" | "published",
 ) {
-  const { chapter } = await getEditableChapter(actor, chapterId);
   parseInput(z.enum(["draft", "published"]), status);
-  await db
-    .update(chapters)
-    .set({
-      status,
-      publishedAt:
-        status === "published" ? (chapter.publishedAt ?? new Date()) : chapter.publishedAt,
-    })
-    .where(eq(chapters.id, chapter.id));
+  if (status === "published") return publishChapter(actor, chapterId, { publishStory: false });
+  const { chapter } = await getEditableChapter(actor, chapterId);
+  await db.update(chapters).set({ status: "draft" }).where(eq(chapters.id, chapter.id));
 }
 
 /**
- * Publishes a chapter and, optionally, the story it belongs to. This is the
- * single "Publish" button in the editor.
+ * Publishes a chapter's current text and, optionally, the story it belongs
+ * to. This is the "Publish" / "Publish changes" button in the editor.
+ * Readers keep seeing the last published text until the writer publishes
+ * again, and every publish is recorded as a version in the story history.
  */
 export async function publishChapter(
   actor: Actor,
   chapterId: string,
-  options: { publishStory: boolean },
+  options: { publishStory: boolean; message?: string },
 ) {
   const { chapter, story } = await getEditableChapter(actor, chapterId);
+  const message = parseInput(publishMessageSchema, options.message ?? "");
   const now = new Date();
+  const title = chapter.title || `Chapter ${chapter.position}`;
+  const wasPublished = chapter.publishedContent !== null;
+
   await db.transaction(async (tx) => {
     await tx
       .update(chapters)
-      .set({ status: "published", publishedAt: chapter.publishedAt ?? now })
+      .set({
+        status: "published",
+        publishedAt: chapter.publishedAt ?? now,
+        publishedContent: chapter.content,
+        publishedTitle: chapter.title,
+        publishedWordCount: chapter.wordCount,
+        publishedRevision: chapter.revision,
+      })
       .where(eq(chapters.id, chapter.id));
     if (options.publishStory && story.status !== "published") {
       await tx
@@ -155,6 +173,12 @@ export async function publishChapter(
         .set({ status: "published", publishedAt: story.publishedAt ?? now })
         .where(eq(stories.id, story.id));
     }
+    await recordVersion(tx, {
+      storyId: story.id,
+      kind: "published",
+      message: message || (wasPublished ? `Updated “${title}”` : `Published “${title}”`),
+      authorId: story.authorId,
+    });
   });
 }
 
@@ -238,21 +262,29 @@ export async function getReaderChapter(
     ? eq(chapters.storyId, row.story.id)
     : and(eq(chapters.storyId, row.story.id), eq(chapters.status, "published"));
 
-  const toc = await db
+  // Readers see the published title; the author sees their working title.
+  const tocRows = await db
     .select({
       id: chapters.id,
       position: chapters.position,
       title: chapters.title,
+      publishedTitle: chapters.publishedTitle,
       status: chapters.status,
     })
     .from(chapters)
     .where(visible)
     .orderBy(asc(chapters.position));
+  const toc = tocRows.map(({ publishedTitle, ...c }) => ({
+    ...c,
+    title: isOwner ? c.title : (publishedTitle ?? c.title),
+  }));
 
   const index = toc.findIndex((c) => c.position === position);
   if (index === -1) return null;
 
   const [chapter] = await db.select().from(chapters).where(eq(chapters.id, toc[index].id)).limit(1);
+  // Readers see the last published text; the author previews their latest draft.
+  const showDraft = isOwner || chapter.publishedContent === null;
 
   return {
     story: { ...row.story, coverUrl: fileUrl(row.story.coverKey), genreName: row.genreName },
@@ -260,13 +292,17 @@ export async function getReaderChapter(
     chapter: {
       id: chapter.id,
       position: chapter.position,
-      title: chapter.title,
+      title: showDraft ? chapter.title : (chapter.publishedTitle ?? chapter.title),
       status: chapter.status,
-      wordCount: chapter.wordCount,
+      wordCount: showDraft ? chapter.wordCount : chapter.publishedWordCount,
       publishedAt: chapter.publishedAt,
       updatedAt: chapter.updatedAt,
-      html: renderDocToHtml(sanitizeDoc(chapter.content as DocNode)),
+      html: renderDocToHtml(
+        sanitizeDoc((showDraft ? chapter.content : chapter.publishedContent) as DocNode),
+      ),
     },
+    /** The author is looking at edits that readers can't see yet. */
+    previewingDraft: isOwner && chapter.revision !== chapter.publishedRevision,
     toc,
     number: index + 1,
     prev: toc[index - 1] ?? null,

@@ -15,6 +15,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,8 @@ interface Props {
     content: DocNode;
     revision: number;
     status: "draft" | "published";
+    /** Revision readers currently see (null if never published). */
+    publishedRevision: number | null;
     position: number;
   };
   story: { id: string; title: string; status: string; language: string };
@@ -50,6 +53,13 @@ export function ChapterEditor({ chapter, story, readerHref }: Props) {
   const titleRef = useRef(chapter.title);
   const { state, schedule, flush } = useAutosave(chapter.id, chapter.revision);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [isPublished, setIsPublished] = useState(chapter.status === "published");
+  const [storyStatus, setStoryStatus] = useState(story.status);
+  // Published chapters keep showing readers the last published text; track
+  // whether the writer has edits readers can't see yet.
+  const [hasUnpublishedEdits, setHasUnpublishedEdits] = useState(
+    chapter.status === "published" && chapter.revision !== chapter.publishedRevision,
+  );
   const [staleBackup, setStaleBackup] = useState<{
     title: string;
     content: unknown;
@@ -86,6 +96,7 @@ export function ChapterEditor({ chapter, story, readerHref }: Props) {
     },
     onUpdate: ({ editor }) => {
       setWords(countWords(editor.getText()));
+      setHasUnpublishedEdits(true);
       schedule({ title: titleRef.current, content: editor.getJSON() });
     },
   });
@@ -105,6 +116,7 @@ export function ChapterEditor({ chapter, story, readerHref }: Props) {
   function onTitleChange(value: string) {
     setTitle(value);
     titleRef.current = value;
+    setHasUnpublishedEdits(true);
     if (editor) schedule({ title: value, content: editor.getJSON() });
   }
 
@@ -127,12 +139,21 @@ export function ChapterEditor({ chapter, story, readerHref }: Props) {
                 <EyeIcon /> Preview
               </Link>
             </Button>
-            {chapter.status === "published" && story.status === "published" ? (
-              <Badge variant="published">Published</Badge>
-            ) : (
+            {!isPublished || storyStatus === "draft" ? (
               <Button size="sm" variant="accent" onClick={() => setPublishOpen(true)}>
                 Publish
               </Button>
+            ) : hasUnpublishedEdits ? (
+              <Button
+                size="sm"
+                variant="accent"
+                onClick={() => setPublishOpen(true)}
+                title="Readers still see the last version you published"
+              >
+                Publish changes
+              </Button>
+            ) : (
+              <Badge variant="published">Published</Badge>
             )}
           </div>
         </div>
@@ -230,10 +251,13 @@ export function ChapterEditor({ chapter, story, readerHref }: Props) {
         open={publishOpen}
         onOpenChange={setPublishOpen}
         chapterId={chapter.id}
-        storyIsDraft={story.status === "draft"}
-        chapterIsPublished={chapter.status === "published"}
+        storyIsDraft={storyStatus === "draft"}
+        isUpdate={isPublished && storyStatus !== "draft"}
         beforePublish={flush}
-        onPublished={() => {
+        onPublished={(publishedStory) => {
+          setIsPublished(true);
+          setHasUnpublishedEdits(false);
+          if (publishedStory) setStoryStatus("published");
           router.refresh();
           toast.success("Published! Readers can now enjoy it.", {
             action: { label: "View", onClick: () => router.push(readerHref) },
@@ -302,7 +326,7 @@ function PublishDialog({
   onOpenChange,
   chapterId,
   storyIsDraft,
-  chapterIsPublished,
+  isUpdate,
   beforePublish,
   onPublished,
 }: {
@@ -310,11 +334,13 @@ function PublishDialog({
   onOpenChange: (open: boolean) => void;
   chapterId: string;
   storyIsDraft: boolean;
-  chapterIsPublished: boolean;
+  /** The chapter is already public; this publishes the writer's changes. */
+  isUpdate: boolean;
   beforePublish: () => Promise<boolean>;
-  onPublished: () => void;
+  onPublished: (publishedStory: boolean) => void;
 }) {
   const [publishStory, setPublishStory] = useState(true);
+  const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
 
   function publish() {
@@ -326,23 +352,37 @@ function PublishDialog({
         );
         return;
       }
-      const result = await publishChapterAction(chapterId, storyIsDraft ? publishStory : true);
+      // Only a draft story is published from here. Unlisted or archived
+      // stories keep their visibility (changed in Story details).
+      const alsoPublishStory = storyIsDraft && publishStory;
+      const result = await publishChapterAction(chapterId, alsoPublishStory, message);
       if (!result.ok) return void toast.error(result.error);
+      setMessage("");
       onOpenChange(false);
-      onPublished();
+      onPublished(alsoPublishStory);
     });
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogTitle>
-          {chapterIsPublished ? "Publish your story" : "Publish this chapter"}
-        </DialogTitle>
+        <DialogTitle>{isUpdate ? "Publish your changes" : "Publish this chapter"}</DialogTitle>
         <DialogDescription>
-          Readers will see the chapter exactly as it looks now. You can keep editing afterwards —
-          changes appear as soon as they’re saved.
+          Readers will see the chapter exactly as it looks now. Anything you change afterwards stays
+          private until you publish again, and every publish is saved in your story’s history.
         </DialogDescription>
+        <label htmlFor="publish-message" className="mt-5 block text-sm font-medium">
+          What changed? <span className="text-muted-foreground font-normal">(optional)</span>
+        </label>
+        <Textarea
+          id="publish-message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          maxLength={500}
+          rows={2}
+          placeholder={isUpdate ? "e.g. Rewrote the last scene" : "e.g. The first chapter is here!"}
+          className="mt-1.5 min-h-16"
+        />
         {storyIsDraft ? (
           <label className="mt-5 flex items-start gap-3 rounded-md border p-3 text-sm">
             <input

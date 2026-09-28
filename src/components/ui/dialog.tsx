@@ -74,12 +74,15 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = "Delete",
+  tone = "destructive",
   onConfirm,
 }: {
   trigger: React.ReactNode;
   title: string;
   description: string;
   confirmLabel?: string;
+  /** "destructive" for deletions; "default" for safe, undoable actions. */
+  tone?: "destructive" | "default";
   onConfirm: () => void;
 }) {
   return (
@@ -99,7 +102,9 @@ export function ConfirmDialog({
               Cancel
             </AlertPrimitive.Cancel>
             <AlertPrimitive.Action
-              className={buttonVariants({ variant: "destructive" })}
+              className={buttonVariants({
+                variant: tone === "destructive" ? "destructive" : "default",
+              })}
               onClick={onConfirm}
             >
               {confirmLabel}

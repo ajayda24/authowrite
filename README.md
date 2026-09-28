@@ -14,7 +14,7 @@ platform is free software you can run yourself.
 
 ---
 
-## Status: V1 — Foundation
+## Status: V2 — Story History
 
 | For readers                                                       | For writers                                                     | For self-hosters                                     |
 | ----------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------- |
@@ -103,7 +103,7 @@ Authowrite is built one version at a time. Each version is completed, tested and
 before the next begins.
 
 - [x] **V1 — Foundation:** writing, publishing, reading, discovery, social basics
-- [ ] **V2 — Story history:** snapshots, published versions, compare and restore
+- [x] **V2 — Story history:** saved and published versions, compare, restore
 - [ ] **V3 — Branches, forks and readable diffs**
 - [ ] **V4 — Collaboration:** roles, suggestions, contribution review
 - [ ] **V5 — Remix culture:** the Story Tree, attribution for derivatives
