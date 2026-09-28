@@ -24,7 +24,7 @@ export const storySummaryFields = {
   authorUsername: users.username,
   authorImage: users.image,
   chapterCount: sql<number>`(select count(*)::int from ${chapters} where ${chapters.storyId} = ${stories.id} and ${chapters.status} = 'published')`,
-  wordCount: sql<number>`(select coalesce(sum(${chapters.wordCount}), 0)::int from ${chapters} where ${chapters.storyId} = ${stories.id} and ${chapters.status} = 'published')`,
+  wordCount: sql<number>`(select coalesce(sum(${chapters.publishedWordCount}), 0)::int from ${chapters} where ${chapters.storyId} = ${stories.id} and ${chapters.status} = 'published')`,
   likeCount: sql<number>`(select count(*)::int from ${storyLikes} where ${storyLikes.storyId} = ${stories.id})`,
 };
 

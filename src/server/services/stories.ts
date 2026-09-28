@@ -6,7 +6,7 @@
  */
 import { and, asc, count, desc, eq, inArray, max, sql } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "@/server/db";
+import { db, type Executor } from "@/server/db";
 import {
   bookmarks,
   chapters,
@@ -17,6 +17,7 @@ import {
   stories,
   storyLikes,
   storyTags,
+  storyVersions,
   tags,
   users,
   type StoryStatus,
@@ -60,6 +61,18 @@ export async function getEditableStory(actor: Actor, storyId: string): Promise<S
   if (!story) throw new NotFoundError("Story");
   if (story.authorId !== user.id) throw new ForbiddenError();
   return story;
+}
+
+/** Replaces a story's tags with the given (already normalized) names. */
+export async function setStoryTags(exec: Executor, storyId: string, tagNames: string[]) {
+  await exec.delete(storyTags).where(eq(storyTags.storyId, storyId));
+  if (tagNames.length === 0) return;
+  await exec
+    .insert(tags)
+    .values(tagNames.map((name) => ({ name })))
+    .onConflictDoNothing();
+  const tagRows = await exec.select({ id: tags.id }).from(tags).where(inArray(tags.name, tagNames));
+  await exec.insert(storyTags).values(tagRows.map((t) => ({ storyId, tagId: t.id })));
 }
 
 // ---------------------------------------------------------------------------
@@ -131,18 +144,7 @@ export async function updateStory(actor: Actor, storyId: string, input: UpdateSt
       })
       .where(eq(stories.id, story.id));
 
-    await tx.delete(storyTags).where(eq(storyTags.storyId, story.id));
-    if (tagNames.length > 0) {
-      await tx
-        .insert(tags)
-        .values(tagNames.map((name) => ({ name })))
-        .onConflictDoNothing();
-      const tagRows = await tx
-        .select({ id: tags.id })
-        .from(tags)
-        .where(inArray(tags.name, tagNames));
-      await tx.insert(storyTags).values(tagRows.map((t) => ({ storyId: story.id, tagId: t.id })));
-    }
+    await setStoryTags(tx, story.id, tagNames);
   });
 
   return { slug };
@@ -192,6 +194,8 @@ export async function getStoryWorkspace(actor: Actor, storyId: string) {
         wordCount: chapters.wordCount,
         updatedAt: chapters.updatedAt,
         publishedAt: chapters.publishedAt,
+        /** Published, but edited since: readers still see the older text. */
+        hasUnpublishedChanges: sql<boolean>`${chapters.status} = 'published' and ${chapters.revision} is distinct from ${chapters.publishedRevision}`,
       })
       .from(chapters)
       .where(eq(chapters.storyId, story.id))
@@ -289,30 +293,44 @@ export async function getPublicStory(viewer: Actor, username: string, slug: stri
     ? eq(chapters.storyId, storyId)
     : and(eq(chapters.storyId, storyId), eq(chapters.status, "published"));
 
-  const [chapterRows, tagRows, [likes], [marks], [commentTotal], viewerState] = await Promise.all([
-    db
-      .select({
-        id: chapters.id,
-        position: chapters.position,
-        title: chapters.title,
-        status: chapters.status,
-        wordCount: chapters.wordCount,
-        publishedAt: chapters.publishedAt,
-      })
-      .from(chapters)
-      .where(chapterFilter)
-      .orderBy(asc(chapters.position)),
-    db
-      .select({ name: tags.name })
-      .from(storyTags)
-      .innerJoin(tags, eq(tags.id, storyTags.tagId))
-      .where(eq(storyTags.storyId, storyId))
-      .orderBy(asc(tags.name)),
-    db.select({ value: count() }).from(storyLikes).where(eq(storyLikes.storyId, storyId)),
-    db.select({ value: count() }).from(bookmarks).where(eq(bookmarks.storyId, storyId)),
-    db.select({ value: count() }).from(comments).where(eq(comments.storyId, storyId)),
-    viewer ? getViewerStoryState(viewer.id, storyId, row.story.authorId) : null,
-  ]);
+  const [rawChapters, tagRows, [likes], [marks], [commentTotal], viewerState, latestPublished] =
+    await Promise.all([
+      db
+        .select({
+          id: chapters.id,
+          position: chapters.position,
+          title: chapters.title,
+          publishedTitle: chapters.publishedTitle,
+          status: chapters.status,
+          wordCount: chapters.wordCount,
+          publishedWordCount: chapters.publishedWordCount,
+          publishedAt: chapters.publishedAt,
+        })
+        .from(chapters)
+        .where(chapterFilter)
+        .orderBy(asc(chapters.position)),
+      db
+        .select({ name: tags.name })
+        .from(storyTags)
+        .innerJoin(tags, eq(tags.id, storyTags.tagId))
+        .where(eq(storyTags.storyId, storyId))
+        .orderBy(asc(tags.name)),
+      db.select({ value: count() }).from(storyLikes).where(eq(storyLikes.storyId, storyId)),
+      db.select({ value: count() }).from(bookmarks).where(eq(bookmarks.storyId, storyId)),
+      db.select({ value: count() }).from(comments).where(eq(comments.storyId, storyId)),
+      viewer ? getViewerStoryState(viewer.id, storyId, row.story.authorId) : null,
+      db
+        .select({ number: storyVersions.number, createdAt: storyVersions.createdAt })
+        .from(storyVersions)
+        .where(and(eq(storyVersions.storyId, storyId), eq(storyVersions.kind, "published")))
+        .orderBy(desc(storyVersions.number))
+        .limit(1),
+    ]);
+
+  // Readers see published titles and word counts; the author sees their drafts.
+  const chapterRows = rawChapters.map(({ publishedTitle, publishedWordCount, ...c }) =>
+    isOwner ? c : { ...c, title: publishedTitle ?? c.title, wordCount: publishedWordCount },
+  );
 
   return {
     story: { ...row.story, coverUrl: fileUrl(row.story.coverKey), genreName: row.genreName },
@@ -324,10 +342,12 @@ export async function getPublicStory(viewer: Actor, username: string, slug: stri
       bookmarks: marks.value,
       comments: commentTotal.value,
       views: row.story.viewCount,
-      words: chapterRows
+      words: rawChapters
         .filter((c) => c.status === "published")
-        .reduce((sum, c) => sum + c.wordCount, 0),
+        .reduce((sum, c) => sum + c.publishedWordCount, 0),
     },
+    /** Most recent published version, for "Updated … · Version N". */
+    latestVersion: latestPublished[0] ?? null,
     viewer: viewerState,
     isOwner,
   };

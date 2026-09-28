@@ -6,6 +6,10 @@ import { env } from "@/server/env";
 import * as schema from "./schema";
 
 export type Database = PgDatabase<PgQueryResultHKT, typeof schema>;
+/** A transaction handle, as passed to `db.transaction(async (tx) => …)`. */
+export type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
+/** Anything that can run queries: the database itself or a transaction. */
+export type Executor = Database | Transaction;
 
 const globalForDb = globalThis as unknown as { __authowriteDb?: Database; __authowritePool?: Pool };
 

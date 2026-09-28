@@ -24,6 +24,6 @@ export async function getTestDb() {
 export async function resetDb() {
   const db = await getTestDb();
   await db.execute(
-    sql`truncate table users, stories, chapters, tags, story_tags, uploads, story_likes, bookmarks, follows, comments, reading_progress, sessions, accounts, verifications restart identity cascade`,
+    sql`truncate table users, stories, chapters, story_versions, content_blobs, tags, story_tags, uploads, story_likes, bookmarks, follows, comments, reading_progress, sessions, accounts, verifications restart identity cascade`,
   );
 }
