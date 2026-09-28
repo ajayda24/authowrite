@@ -1,6 +1,6 @@
 /**
- * Applies pending SQL migrations from ./drizzle. Used by `pnpm db:migrate`
- * and by the Docker entrypoint before the server starts.
+ * Applies pending SQL migrations from ./drizzle. Used by `pnpm db:migrate`,
+ * by the Docker entrypoint before the server starts, and by `vercel-build`.
  */
 import "dotenv/config";
 import path from "node:path";
@@ -9,8 +9,13 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
 async function main() {
-  const url =
-    process.env.DATABASE_URL ?? "postgres://authowrite:authowrite@localhost:5432/authowrite";
+  const configured = process.env.DATABASE_URL?.trim();
+  if (!configured && process.env.VERCEL) {
+    // Don't fail a Vercel build (e.g. preview deploys) for a missing database.
+    console.warn("DATABASE_URL is not set — skipping migrations. Set it to apply them on deploy.");
+    return;
+  }
+  const url = configured || "postgres://authowrite:authowrite@localhost:5432/authowrite";
   const pool = new Pool({ connectionString: url, max: 1 });
   const migrationsFolder = process.env.MIGRATIONS_DIR ?? path.join(process.cwd(), "drizzle");
   console.log(`Applying migrations from ${migrationsFolder}…`);

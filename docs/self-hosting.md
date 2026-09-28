@@ -17,6 +17,35 @@ docker compose up -d
 The `web` container applies database migrations on every start, then launches the server on
 port 3000. Health check: `GET /api/health` → `{"status":"ok"}`.
 
+## Deploying to Vercel
+
+Authowrite runs on Vercel, but Vercel provides neither a database nor persistent disk storage, so
+you bring both:
+
+1. **Database:** any PostgreSQL 16+ reachable from Vercel (e.g. Neon, Supabase, or your own server).
+2. **File storage:** an S3-compatible bucket (Cloudflare R2, AWS S3, Backblaze B2, …). Vercel's
+   filesystem is temporary, so the default `local` driver would lose uploaded images.
+3. In **Vercel → Project → Settings → Environment Variables**, set:
+
+   | Variable                                                                            | Value                                                                                |
+   | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+   | `DATABASE_URL`                                                                      | Your PostgreSQL connection string                                                    |
+   | `BETTER_AUTH_SECRET`                                                                | Output of `openssl rand -base64 32` (at least 16 characters)                         |
+   | `STORAGE_DRIVER`                                                                    | `s3`                                                                                 |
+   | `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Your bucket's details                                                                |
+   | `APP_URL`                                                                           | Optional; defaults to your Vercel production URL. Set it when using a custom domain. |
+   | `SMTP_URL`, `MAIL_FROM`                                                             | Recommended, for password-reset emails                                               |
+
+   **Leave unused variables unset** rather than empty. Blank values are ignored, but it keeps the
+   configuration easy to read.
+
+4. Deploy. The `vercel-build` script applies database migrations before building. Migrations are
+   skipped (with a warning) if `DATABASE_URL` isn't set, e.g. on preview deployments.
+5. Optional demo content: run `DATABASE_URL=<production url> pnpm db:seed` once from your machine.
+
+If configuration is missing or invalid, the server refuses to start and logs a message naming the
+variable to fix (see the deployment's runtime logs).
+
 ## Configuration
 
 All settings are environment variables; `.env.example` documents each one.

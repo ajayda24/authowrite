@@ -38,6 +38,11 @@ docker compose up
 Open <http://localhost:3000> and create an account. Before exposing an instance to the internet,
 set `BETTER_AUTH_SECRET` (see [self-hosting](docs/self-hosting.md)).
 
+### On Vercel
+
+Bring a PostgreSQL database and an S3-compatible bucket, set the environment variables, and deploy.
+See [Deploying to Vercel](docs/self-hosting.md#deploying-to-vercel).
+
 ### For development
 
 Requirements: Node.js 22+, pnpm 10+, PostgreSQL 16+.

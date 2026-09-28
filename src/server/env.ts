@@ -1,31 +1,17 @@
 import "server-only";
-import { z } from "zod";
+import { parseEnv, type Env } from "./config";
 
-const schema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  APP_URL: z.string().url().default("http://localhost:3000"),
-  DATABASE_URL: z.string().default("postgres://authowrite:authowrite@localhost:5432/authowrite"),
-  BETTER_AUTH_SECRET: z.string().min(16).optional(),
+export { ConfigError, parseEnv, type Env } from "./config";
 
-  STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),
-  STORAGE_LOCAL_DIR: z.string().default("./storage"),
-  S3_ENDPOINT: z.string().optional(),
-  S3_REGION: z.string().default("us-east-1"),
-  S3_BUCKET: z.string().optional(),
-  S3_ACCESS_KEY_ID: z.string().optional(),
-  S3_SECRET_ACCESS_KEY: z.string().optional(),
-  S3_FORCE_PATH_STYLE: z
-    .enum(["true", "false"])
-    .default("true")
-    .transform((v) => v === "true"),
+let cached: Env | null = null;
 
-  SMTP_URL: z.string().optional(),
-  MAIL_FROM: z.string().default("Authowrite <no-reply@localhost>"),
+/** Validated configuration, parsed on first use (not at import or build time). */
+export function getEnv(): Env {
+  cached ??= parseEnv(process.env);
+  return cached;
+}
 
-  GITHUB_CLIENT_ID: z.string().optional(),
-  GITHUB_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
+/** Lazily-validated configuration object. Reading any field triggers validation. */
+export const env = new Proxy({} as Env, {
+  get: (_target, key) => getEnv()[key as keyof Env],
 });
-
-export const env = schema.parse(process.env);

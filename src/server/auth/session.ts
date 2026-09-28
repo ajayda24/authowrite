@@ -2,7 +2,7 @@ import "server-only";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { auth } from "./index";
+import { getAuth } from "./index";
 
 export interface Viewer {
   id: string;
@@ -13,7 +13,10 @@ export interface Viewer {
 
 /** The signed-in user for this request, or null. Memoized per request. */
 export const getViewer = cache(async (): Promise<Viewer | null> => {
-  const session = await auth.api.getSession({ headers: await headers() });
+  // Read headers first: during prerendering this marks the page dynamic
+  // before the auth instance (which needs run-time secrets) is created.
+  const requestHeaders = await headers();
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
   if (!session) return null;
   const user = session.user as typeof session.user & { username?: string | null };
   return {
